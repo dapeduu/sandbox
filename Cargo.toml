@@ -13,7 +13,8 @@ winit = "0.27"
 env_logger = "0.9"
 log = "0.4"
 wgpu = "0.14"
-cfg-if = "1"  # Managing platform specific code
+cfg-if = "1" # Managing platform specific code
+pollster = "0.2.5" # Makes possible for the main to await the future
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 console_error_panic_hook = "0.1.6"
