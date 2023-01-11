@@ -1,29 +1,17 @@
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [package]
-name = "lp"
+name = "minimal-winit"
 version = "0.1.0"
+authors = ["Jay Oster <jay@kodewerx.org>"]
 edition = "2021"
+publish = false
 
-[lib]
-crate-type = ["cdylib", "rlib"]
+[features]
+optimize = ["log/release_max_level_warn"]
+default = ["optimize"]
 
 [dependencies]
-winit = "0.27"
 env_logger = "0.9"
 log = "0.4"
-wgpu = "0.14"
-cfg-if = "1" # Managing platform specific code
-pollster = "0.2.5" # Makes possible for the main to await the future
-
-[target.'cfg(target_arch = "wasm32")'.dependencies]
-console_error_panic_hook = "0.1.6"
-console_log = "0.2.0"
-wgpu = { version = "0.14", features = ["webgl"]}
-wasm-bindgen = "0.2"
-wasm-bindgen-futures = "0.4.30"
-web-sys = { version = "0.3", features = [
-    "Document",
-    "Window",
-    "Element",
-]}
+pixels = "0.11.0"
+winit = "0.27"
+winit_input_helper = "0.13"
