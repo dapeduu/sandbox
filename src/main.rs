@@ -115,8 +115,8 @@ impl World {
     /// Assumes the default texture format: `wgpu::TextureFormat::Rgba8UnormSrgb`
     fn draw(&self, frame: &mut [u8], vec: Vec<Particle> ) {
 
-        clear(frame);
-    
+        //clear(frame);
+        frame.fill(150);
         for part in &vec{
                    let index :usize =((part.y*WIDTH + part.x)*4) as usize;      
                    frame[index] = 0x00;
