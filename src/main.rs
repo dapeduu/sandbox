@@ -8,24 +8,22 @@ use winit::event::{Event, VirtualKeyCode};
 use winit::event_loop::{ControlFlow, EventLoop};
 use winit::window::WindowBuilder;
 use winit_input_helper::WinitInputHelper;
+use pixels::wgpu::Color;
+use std::process::exit;
 
-const WIDTH: u32 = 320;
-const HEIGHT: u32 = 240;
-const BOX_SIZE: i16 = 64;
+const WIDTH: u32 = 200;
+const HEIGHT: u32 = 150;
 
 /// Representation of the application state. In this example, a box will bounce around the screen.
 #[derive(Copy, Clone)]
 struct World {
-    box_x: i16,
-    box_y: i16,
-    velocity_x: i16,
-    velocity_y: i16,
+
 }
 
 #[derive(Copy, Clone)]
 struct Particle{
-    x: i32,
-    y: i32,
+    x: i16,
+    y: i16,
 }
 
 fn main() -> Result<(), Error> {
@@ -34,11 +32,11 @@ fn main() -> Result<(), Error> {
     let mut input = WinitInputHelper::new();
     let window = {
         let size = LogicalSize::new(WIDTH as f64, HEIGHT as f64);
+        let scaled_size = LogicalSize::new(WIDTH as f64 * 2.0, HEIGHT as f64 * 2.0);
         WindowBuilder::new()
             .with_title("Hello Pixels")
-            .with_inner_size(size)
+            .with_inner_size(scaled_size)
             .with_min_inner_size(size)
-            .with_resizable(false)
             .build(&event_loop)
             .unwrap()
     };
@@ -49,6 +47,7 @@ fn main() -> Result<(), Error> {
         Pixels::new(WIDTH, HEIGHT, surface_texture)?
     };
     let mut world = World::new();
+    pixels.set_clear_color(Color::RED);
 
     let mut particlevec: Vec<Particle>  = Vec::new();
 
@@ -76,18 +75,15 @@ fn main() -> Result<(), Error> {
             }
             if input.mouse_pressed(0){
                 let mousepos = input.mouse().unwrap();
-                let novaparticula = Particle {x : (mousepos.0 as i32)-28 , y : (mousepos.1 as i32) -21 };
-                println!("Mouse x {:?} y {:?}", novaparticula.x, novaparticula.y);
+                let pixelpos =  pixels.window_pos_to_pixel(mousepos).unwrap_or_else(|pos| pixels.clamp_pixel_pos(pos));
+                let novaparticula = Particle {x : pixelpos.0 as i16, y : pixelpos.1  as i16 };  
                 particlevec.push(novaparticula);
 
             }
-
-
-
-            // Resize the window
-            //if let Some(size) = input.window_resized() {
-            //    pixels.resize_surface(size.width, size.height);
-            //}
+             //Resize the window
+            if let Some(size) = input.window_resized() {
+                pixels.resize_surface(size.width, size.height);
+            }
 
             // Update internal state and request a redraw
             world.update();
@@ -100,24 +96,11 @@ impl World {
     /// Create a new `World` instance that can draw a moving box.
     fn new() -> Self {
         Self {
-            box_x: 24,
-            box_y: 16,
-            velocity_x: 1,
-            velocity_y: 1,
         }
     }
 
     /// Update the `World` internal state; bounce the box around the screen.
     fn update(&mut self) {
-        if self.box_x <= 0 || self.box_x + BOX_SIZE > WIDTH as i16 {
-            self.velocity_x *= -1;
-        }
-        if self.box_y <= 0 || self.box_y + BOX_SIZE > HEIGHT as i16 {
-            self.velocity_y *= -1;
-        }
-
-        self.box_x += self.velocity_x;
-        self.box_y += self.velocity_y;
     }
 
     /// Draw the `World` state to the frame buffer.
@@ -128,19 +111,11 @@ impl World {
             let x = (i % WIDTH as usize) as i16;
             let y = (i / WIDTH as usize) as i16;
 
-            let inside_the_box = x >= self.box_x
-                && x < self.box_x + BOX_SIZE
-                && y >= self.box_y
-                && y < self.box_y + BOX_SIZE;
 
-            let mut rgba = if inside_the_box {
-                [0x5e, 0x48, 0xe8, 0xff]
-            } else {
-                [0x48, 0xb2, 0xe8, 0xff]
-                };
+
+            let mut rgba = [0x48, 0xb2, 0xe8, 0xff];
             for part in &vec{
-                if part.x  as i16 == x && part.y as i16 == y {
-                   rgba = [0x08, 0x02, 0x08, 0xff]
+                   rgba = [0x08, 0x02, 0x08, 0xff];
                 }
             }
 
