@@ -14,11 +14,18 @@ const HEIGHT: u32 = 240;
 const BOX_SIZE: i16 = 64;
 
 /// Representation of the application state. In this example, a box will bounce around the screen.
+#[derive(Copy, Clone)]
 struct World {
     box_x: i16,
     box_y: i16,
     velocity_x: i16,
     velocity_y: i16,
+}
+
+#[derive(Copy, Clone)]
+struct Particle{
+    x: i32,
+    y: i32,
 }
 
 fn main() -> Result<(), Error> {
@@ -31,6 +38,7 @@ fn main() -> Result<(), Error> {
             .with_title("Hello Pixels")
             .with_inner_size(size)
             .with_min_inner_size(size)
+            .with_resizable(false)
             .build(&event_loop)
             .unwrap()
     };
@@ -42,10 +50,13 @@ fn main() -> Result<(), Error> {
     };
     let mut world = World::new();
 
+    let mut particlevec: Vec<Particle>  = Vec::new();
+
+
     event_loop.run(move |event, _, control_flow| {
         // Draw the current frame
         if let Event::RedrawRequested(_) = event {
-            world.draw(pixels.get_frame_mut());
+            world.draw(pixels.get_frame_mut(),particlevec.clone());
             if pixels
                 .render()
                 .map_err(|e| error!("pixels.render() failed: {}", e))
@@ -63,11 +74,20 @@ fn main() -> Result<(), Error> {
                 *control_flow = ControlFlow::Exit;
                 return;
             }
+            if input.mouse_pressed(0){
+                let mousepos = input.mouse().unwrap();
+                let novaparticula = Particle {x : (mousepos.0 as i32)-28 , y : (mousepos.1 as i32) -21 };
+                println!("Mouse x {:?} y {:?}", novaparticula.x, novaparticula.y);
+                particlevec.push(novaparticula);
+
+            }
+
+
 
             // Resize the window
-            if let Some(size) = input.window_resized() {
-                pixels.resize_surface(size.width, size.height);
-            }
+            //if let Some(size) = input.window_resized() {
+            //    pixels.resize_surface(size.width, size.height);
+            //}
 
             // Update internal state and request a redraw
             world.update();
@@ -103,7 +123,7 @@ impl World {
     /// Draw the `World` state to the frame buffer.
     ///
     /// Assumes the default texture format: `wgpu::TextureFormat::Rgba8UnormSrgb`
-    fn draw(&self, frame: &mut [u8]) {
+    fn draw(&self, frame: &mut [u8], vec: Vec<Particle> ) {
         for (i, pixel) in frame.chunks_exact_mut(4).enumerate() {
             let x = (i % WIDTH as usize) as i16;
             let y = (i / WIDTH as usize) as i16;
@@ -113,11 +133,16 @@ impl World {
                 && y >= self.box_y
                 && y < self.box_y + BOX_SIZE;
 
-            let rgba = if inside_the_box {
+            let mut rgba = if inside_the_box {
                 [0x5e, 0x48, 0xe8, 0xff]
             } else {
                 [0x48, 0xb2, 0xe8, 0xff]
-            };
+                };
+            for part in &vec{
+                if part.x  as i16 == x && part.y as i16 == y {
+                   rgba = [0x08, 0x02, 0x08, 0xff]
+                }
+            }
 
             pixel.copy_from_slice(&rgba);
         }
