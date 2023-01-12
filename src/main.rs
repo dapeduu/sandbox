@@ -24,6 +24,7 @@ struct World {
 struct Particle{
     x: u32,
     y: u32,
+  //  speed: i32,
 }
 
 fn main() -> Result<(), Error> {
@@ -73,8 +74,8 @@ fn main() -> Result<(), Error> {
                 *control_flow = ControlFlow::Exit;
                 return;
             }
-            if input.mouse_pressed(0){
-                let mousepos = input.mouse().unwrap();
+            if input.mouse_held(0){
+                let mousepos = input.mouse().unwrap();  
                 let pixelpos =  pixels.window_pos_to_pixel(mousepos).unwrap_or_else(|pos| pixels.clamp_pixel_pos(pos));
                 let novaparticula = Particle {x : pixelpos.0 as u32, y : pixelpos.1  as u32 };  
                 particlevec.push(novaparticula);
@@ -86,16 +87,10 @@ fn main() -> Result<(), Error> {
             }
 
             // Update internal state and request a redraw
-            world.update();
+            world.update(particlevec.as_mut_slice());
             window.request_redraw();
         }
     });
-}
-
-
-
-pub fn clear(ary: &mut [u8]) {
-    ary.iter_mut().for_each(|m| *m = 0)
 }
 
 
@@ -107,24 +102,31 @@ impl World {
     }
 
     /// Update the `World` internal state; bounce the box around the screen.
-    fn update(&mut self) {
+    fn update(&mut self, vec: &mut [Particle] ) {
+        for particle in vec{
+            particle.y += 1;
+            if particle.y >= HEIGHT{
+                particle.y = HEIGHT-1;
+            }
+
+        }
     }
 
     /// Draw the `World` state to the frame buffer.
     ///
     /// Assumes the default texture format: `wgpu::TextureFormat::Rgba8UnormSrgb`
     fn draw(&self, frame: &mut [u8], vec: Vec<Particle> ) {
-
         //clear(frame);
         frame.fill(150);
-        for part in &vec{
-                   let index :usize =((part.y*WIDTH + part.x)*4) as usize;      
-                   frame[index] = 0x00;
-                   frame[index+1] = 0x00;
-                   frame[index+2] = 0xff;
-                   frame[index+3] = 0xff;              
+        for particle in &vec{
+                   let index :usize =((particle.y*WIDTH + particle.x)*4) as usize;      
+                   frame[index] = 0x00;      //r
+                   frame[index+1] = 0x00;    //g
+                   frame[index+2] = 0xff;    //b
+                   frame[index+3] = 0xff;    //a          
                 }
-        
-
+        //[][][][][] WIDTH*Heigh /30000  0   1    2    3      --- 400
+        //                                400 401 402 403          400
+        //                                800 801 803 803 -
     }
 }
