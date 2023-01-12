@@ -11,8 +11,8 @@ use winit_input_helper::WinitInputHelper;
 //use pixels::wgpu::Color;
 use std::process::exit;
 
-const WIDTH: u32 = 200;
-const HEIGHT: u32 = 150;
+static WIDTH: u32 = 200;
+static HEIGHT: u32 = 150;
 
 /// Representation of the application state. In this example, a box will bounce around the screen.
 #[derive(Copy, Clone)]
@@ -24,7 +24,21 @@ struct World {
 struct Particle{
     x: u32,
     y: u32,
-  //  speed: i32,
+}
+
+impl Particle{
+    fn move_particle(&mut self,frame: &mut [u8]){
+        let  index :usize = position_to_index(self.x,self.y+1);
+        if (self.y+1 >= HEIGHT){
+            return;
+        }
+        
+        if (frame[index+2])==0xef{  }
+        else{
+            self.y +=1;
+        }
+
+    }
 }
 
 fn main() -> Result<(), Error> {
@@ -56,7 +70,7 @@ fn main() -> Result<(), Error> {
     event_loop.run(move |event, _, control_flow| {
         // Draw the current frame
         if let Event::RedrawRequested(_) = event {
-            world.draw(pixels.get_frame_mut(),particlevec.clone());
+            world.draw(pixels.get_frame_mut(),particlevec.clone(),WIDTH);
             if pixels
                 .render()
                 .map_err(|e| error!("pixels.render() failed: {}", e))
@@ -87,12 +101,11 @@ fn main() -> Result<(), Error> {
             }
 
             // Update internal state and request a redraw
-            world.update(particlevec.as_mut_slice());
+            world.update(particlevec.as_mut_slice(),pixels.get_frame_mut());
             window.request_redraw();
         }
     });
 }
-
 
 impl World {
     /// Create a new `World` instance that can draw a moving box.
@@ -102,31 +115,32 @@ impl World {
     }
 
     /// Update the `World` internal state; bounce the box around the screen.
-    fn update(&mut self, vec: &mut [Particle] ) {
+    fn update(&mut self, vec: &mut [Particle],frame: &mut [u8] ) {
         for particle in vec{
-            particle.y += 1;
-            if particle.y >= HEIGHT{
-                particle.y = HEIGHT-1;
+            particle.move_particle(frame);
             }
 
         }
-    }
 
     /// Draw the `World` state to the frame buffer.
     ///
     /// Assumes the default texture format: `wgpu::TextureFormat::Rgba8UnormSrgb`
-    fn draw(&self, frame: &mut [u8], vec: Vec<Particle> ) {
+    fn draw(&self, frame: &mut [u8], vec: Vec<Particle>, width: u32) {
         //clear(frame);
         frame.fill(150);
         for particle in &vec{
-                   let index :usize =((particle.y*WIDTH + particle.x)*4) as usize;      
+                   let index :usize = position_to_index(particle.x,particle.y);
                    frame[index] = 0x00;      //r
                    frame[index+1] = 0x00;    //g
-                   frame[index+2] = 0xff;    //b
+                   frame[index+2] = 0xef;    //b
                    frame[index+3] = 0xff;    //a          
                 }
         //[][][][][] WIDTH*Heigh /30000  0   1    2    3      --- 400
         //                                400 401 402 403          400
         //                                800 801 803 803 -
     }
+}
+
+pub fn position_to_index(x:u32 , y:u32) -> usize{
+    return ((y*WIDTH+x)*4) as usize;
 }
