@@ -8,7 +8,7 @@ use winit::event::{Event, VirtualKeyCode};
 use winit::event_loop::{ControlFlow, EventLoop};
 use winit::window::WindowBuilder;
 use winit_input_helper::WinitInputHelper;
-use pixels::wgpu::Color;
+//use pixels::wgpu::Color;
 use std::process::exit;
 
 const WIDTH: u32 = 200;
@@ -22,8 +22,8 @@ struct World {
 
 #[derive(Copy, Clone)]
 struct Particle{
-    x: i16,
-    y: i16,
+    x: u32,
+    y: u32,
 }
 
 fn main() -> Result<(), Error> {
@@ -47,7 +47,7 @@ fn main() -> Result<(), Error> {
         Pixels::new(WIDTH, HEIGHT, surface_texture)?
     };
     let mut world = World::new();
-    pixels.set_clear_color(Color::RED);
+    //pixels.set_clear_color([0,0,]);
 
     let mut particlevec: Vec<Particle>  = Vec::new();
 
@@ -76,7 +76,7 @@ fn main() -> Result<(), Error> {
             if input.mouse_pressed(0){
                 let mousepos = input.mouse().unwrap();
                 let pixelpos =  pixels.window_pos_to_pixel(mousepos).unwrap_or_else(|pos| pixels.clamp_pixel_pos(pos));
-                let novaparticula = Particle {x : pixelpos.0 as i16, y : pixelpos.1  as i16 };  
+                let novaparticula = Particle {x : pixelpos.0 as u32, y : pixelpos.1  as u32 };  
                 particlevec.push(novaparticula);
 
             }
@@ -91,6 +91,13 @@ fn main() -> Result<(), Error> {
         }
     });
 }
+
+
+
+pub fn clear(ary: &mut [u8]) {
+    ary.iter_mut().for_each(|m| *m = 0)
+}
+
 
 impl World {
     /// Create a new `World` instance that can draw a moving box.
@@ -107,19 +114,17 @@ impl World {
     ///
     /// Assumes the default texture format: `wgpu::TextureFormat::Rgba8UnormSrgb`
     fn draw(&self, frame: &mut [u8], vec: Vec<Particle> ) {
-        for (i, pixel) in frame.chunks_exact_mut(4).enumerate() {
-            let x = (i % WIDTH as usize) as i16;
-            let y = (i / WIDTH as usize) as i16;
 
-
-
-            let mut rgba = [0x48, 0xb2, 0xe8, 0xff];
-            for part in &vec{
-                   rgba = [0x08, 0x02, 0x08, 0xff];
+        clear(frame);
+    
+        for part in &vec{
+                   let index :usize =((part.y*WIDTH + part.x)*4) as usize;      
+                   frame[index] = 0x00;
+                   frame[index+1] = 0x00;
+                   frame[index+2] = 0xff;
+                   frame[index+3] = 0xff;              
                 }
-            }
+        
 
-            pixel.copy_from_slice(&rgba);
-        }
     }
 }
