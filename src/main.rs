@@ -49,7 +49,7 @@ fn main() -> Result<(), Error> {
         let size = LogicalSize::new(WIDTH as f64, HEIGHT as f64);
         let scaled_size = LogicalSize::new(WIDTH as f64 * 2.0, HEIGHT as f64 * 2.0);
         WindowBuilder::new()
-            .with_title("Hello Pixels")
+            .with_title("Sandbox")
             .with_inner_size(scaled_size)
             .with_min_inner_size(size)
             .build(&event_loop)
