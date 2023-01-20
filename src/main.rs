@@ -90,7 +90,7 @@ fn main() -> Result<(), Error> {
                 *control_flow = ControlFlow::Exit;
                 return;
             }
-        }
+        }      
 
         // Handle input events
         if input.update(&event) {
@@ -104,12 +104,16 @@ fn main() -> Result<(), Error> {
                 let pixelpos = pixels
                     .window_pos_to_pixel(mousepos)
                     .unwrap_or_else(|pos| pixels.clamp_pixel_pos(pos));
-                let novaparticula = Particle {
-                    x: pixelpos.0 as u32,
-                    y: pixelpos.1 as u32,
-                    rgba: [0x00, 0x00, 0xef, 0xff],
-                };
-                particlevec.push(novaparticula);
+                let index: usize = position_to_index(pixelpos.0 as u32, pixelpos.1 as u32);
+                let frame:&mut[u8] = pixels.get_frame_mut();
+                if (frame[index] == 150){
+                    let novaparticula = Particle {
+                        x: pixelpos.0 as u32,
+                        y: pixelpos.1 as u32,
+                        rgba: [0x00, 0x00, 0xef, 0xff],
+                    };
+                    particlevec.push(novaparticula);
+                }
             }
             //Resize the window
             if let Some(size) = input.window_resized() {
