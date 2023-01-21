@@ -1,5 +1,4 @@
 #![deny(clippy::all)]
-#![forbid(unsafe_code)]
 
 use log::error;
 use pixels::{Error, Pixels, SurfaceTexture};
@@ -11,7 +10,7 @@ use winit_input_helper::WinitInputHelper;
 
 static WIDTH: u32 = 200;
 static HEIGHT: u32 = 150;
-
+static mut CLICKFLAG: bool = true;
 trait BaseParticle {
     /// Handles the particle movement
     fn move_particle(&mut self, frame: &mut [u8]);
@@ -27,6 +26,59 @@ struct Particle {
     y: u32,
     rgba: [u8; 4],
 }
+
+#[derive(Clone)]
+struct SandParticle{
+    x: u32,
+    y: u32,
+    rgba: [u8; 4],
+}
+
+trait SandParticlemove{
+    fn move_particle(&mut self, frame: &mut [u8]);
+
+    fn colision(&self, frame: &mut [u8]) -> bool;
+
+}
+
+
+impl SandParticlemove for SandParticle{
+    fn move_particle(&mut self, frame: &mut [u8]){
+        if self.colision(frame) {
+            return;
+        }
+        let mut index: usize = position_to_index(self.x, self.y + 1);
+        if (frame[index + 2]) != 150{
+            index = position_to_index(self.x -1, self.y + 1);
+            if frame[index + 2] == 150{
+                self.y += 1;
+                self.x -= 1;
+                return;
+            }
+            index = position_to_index(self.x +1, self.y + 1);
+            if frame[index + 2] == 150{
+                self.y += 1;
+                self.x += 1;
+                return;
+            }
+
+        }
+        else{
+            self.y += 1;
+            return;
+        }
+
+    }
+
+    fn colision(&self, frame: &mut [u8]) -> bool {
+        if self.y + 1 >= HEIGHT {
+            return true;
+        }
+        return false;
+    }
+
+}
+
 
 impl BaseParticle for Particle {
     fn move_particle(&mut self, frame: &mut [u8]) {
@@ -99,22 +151,49 @@ fn main() -> Result<(), Error> {
                 *control_flow = ControlFlow::Exit;
                 return;
             }
-            if input.mouse_held(0) {
-                let mousepos = input.mouse().unwrap();
-                let pixelpos = pixels
+            unsafe{
+                if input.key_pressed(VirtualKeyCode::P){
+                    CLICKFLAG = !CLICKFLAG;
+            }
+            if CLICKFLAG {
+                if input.mouse_held(0) {
+        
+                    let mousepos = input.mouse().unwrap();
+                    let pixelpos = pixels
                     .window_pos_to_pixel(mousepos)
                     .unwrap_or_else(|pos| pixels.clamp_pixel_pos(pos));
-                let index: usize = position_to_index(pixelpos.0 as u32, pixelpos.1 as u32);
-                let frame:&mut[u8] = pixels.get_frame_mut();
-                if (frame[index] == 150){
-                    let novaparticula = Particle {
-                        x: pixelpos.0 as u32,
-                        y: pixelpos.1 as u32,
-                        rgba: [0x00, 0x00, 0xef, 0xff],
-                    };
-                    particlevec.push(novaparticula);
+                    let index: usize = position_to_index(pixelpos.0 as u32, pixelpos.1 as u32);
+                    let frame:&mut[u8] = pixels.get_frame_mut();
+                    if (frame[index] == 150){
+                        let novaparticula = Particle {
+                            x: pixelpos.0 as u32,
+                            y: pixelpos.1 as u32,
+                            rgba: [0x00, 0x00, 0xef, 0xff],
+                        };
+                        particlevec.push(novaparticula);
+                    }
                 }
             }
+            else{
+                if input.mouse_pressed(0) {
+                    let mousepos = input.mouse().unwrap();
+                    let pixelpos = pixels
+                    .window_pos_to_pixel(mousepos)
+                    .unwrap_or_else(|pos| pixels.clamp_pixel_pos(pos));
+                    let index: usize = position_to_index(pixelpos.0 as u32, pixelpos.1 as u32);
+                    let frame:&mut[u8] = pixels.get_frame_mut();
+                    if (frame[index] == 150){
+                        let novaparticula = Particle {
+                            x: pixelpos.0 as u32,
+                            y: pixelpos.1 as u32,
+                            rgba: [0x00, 0x00, 0xef, 0xff],
+                        };
+                        particlevec.push(novaparticula);
+                    }
+                }
+  
+        }
+    }
             //Resize the window
             if let Some(size) = input.window_resized() {
                 pixels.resize_surface(size.width, size.height).unwrap();
