@@ -34,34 +34,29 @@ struct SandParticle{
     rgba: [u8; 4],
 }
 
-trait SandParticlemove{
-    fn move_particle(&mut self, frame: &mut [u8]);
-
-    fn colision(&self, frame: &mut [u8]) -> bool;
-
-}
-
-
-impl SandParticlemove for SandParticle{
+impl BaseParticle for SandParticle{
     fn move_particle(&mut self, frame: &mut [u8]){
         if self.colision(frame) {
             return;
         }
         let mut index: usize = position_to_index(self.x, self.y + 1);
         if (frame[index + 2]) != 150{
-            index = position_to_index(self.x -1, self.y + 1);
-            if frame[index + 2] == 150{
-                self.y += 1;
-                self.x -= 1;
-                return;
+            if self.x != 0{
+                index = position_to_index(self.x -1, self.y + 1);
+                if frame[index + 2] == 150{
+                    self.y += 1;
+                    self.x -= 1;
+                    return;
+                }
             }
-            index = position_to_index(self.x +1, self.y + 1);
-            if frame[index + 2] == 150{
-                self.y += 1;
-                self.x += 1;
-                return;
+            if self.x != WIDTH-1{
+                index = position_to_index(self.x +1, self.y + 1);
+                if frame[index + 2] == 150{
+                    self.y += 1;
+                    self.x += 1;
+                    return;
+                }
             }
-
         }
         else{
             self.y += 1;
@@ -126,7 +121,7 @@ fn main() -> Result<(), Error> {
     let mut world = World::new();
     //pixels.set_clear_color([0,0,]);
 
-    let mut particlevec: Vec<Particle> = Vec::new();
+    let mut particlevec: Vec<SandParticle> = Vec::new();
 
     event_loop.run(move |event, _, control_flow| {
         println!("Number of particles: {}", particlevec.len());
@@ -165,10 +160,10 @@ fn main() -> Result<(), Error> {
                     let index: usize = position_to_index(pixelpos.0 as u32, pixelpos.1 as u32);
                     let frame:&mut[u8] = pixels.get_frame_mut();
                     if (frame[index] == 150){
-                        let novaparticula = Particle {
+                        let novaparticula = SandParticle {
                             x: pixelpos.0 as u32,
                             y: pixelpos.1 as u32,
-                            rgba: [0x00, 0x00, 0xef, 0xff],
+                            rgba: [0xef, 0xef, 0x00, 0xff],
                         };
                         particlevec.push(novaparticula);
                     }
@@ -183,10 +178,10 @@ fn main() -> Result<(), Error> {
                     let index: usize = position_to_index(pixelpos.0 as u32, pixelpos.1 as u32);
                     let frame:&mut[u8] = pixels.get_frame_mut();
                     if (frame[index] == 150){
-                        let novaparticula = Particle {
+                        let novaparticula = SandParticle {
                             x: pixelpos.0 as u32,
                             y: pixelpos.1 as u32,
-                            rgba: [0x00, 0x00, 0xef, 0xff],
+                            rgba: [0xef, 0xef, 0x00, 0xff],
                         };
                         particlevec.push(novaparticula);
                     }
@@ -214,7 +209,7 @@ impl World {
     }
 
     /// Update the `World` internal state; bounce the box around the screen.
-    fn update(&mut self, vec: &mut [Particle], frame: &mut [u8]) {
+    fn update(&mut self, vec: &mut [SandParticle], frame: &mut [u8]) {
         for particle in vec {
             particle.move_particle(frame);
         }
@@ -223,7 +218,7 @@ impl World {
     /// Draw the `World` state to the frame buffer.
     ///
     /// Assumes the default texture format: `wgpu::TextureFormat::Rgba8UnormSrgb`
-    fn draw(&self, frame: &mut [u8], vec: Vec<Particle>) {
+    fn draw(&self, frame: &mut [u8], vec: Vec<SandParticle>) {
         //clear(frame);
         frame.fill(150);
         for particle in &vec {
