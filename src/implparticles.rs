@@ -20,7 +20,7 @@ impl BaseParticle for Particle {
         }
 
         let index: usize = position_to_index(self.x, self.y + 1);
-        if (frame[index + 2]) != self.rgba[2] {
+        if (frame[index + 2]) == 150 {
             return false;
         } else {
             return true;
