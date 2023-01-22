@@ -10,73 +10,7 @@ use winit_input_helper::WinitInputHelper;
 use std::process;
 mod particle;
 use particle::*;
-
-static WIDTH: u32 = 200;
-static HEIGHT: u32 = 150;
-trait BaseParticle {
-    fn move_particle(&mut self, frame: &mut [u8]);
-
-    fn colision(&self, frame: &mut [u8]) -> bool;
-}
-
-impl BaseParticle for SandParticle{
-    fn move_particle(&mut self, frame: &mut [u8]){
-        if self.colision(frame) {
-            return;
-        }
-        let mut index: usize = position_to_index(self.x, self.y + 1);
-        if (frame[index + 2]) != 150{
-            if self.x != 0{
-                index = position_to_index(self.x -1, self.y + 1);
-                if frame[index + 2] == 150{
-                    self.y += 1;
-                    self.x -= 1;
-                    return;
-                }
-            }
-            if self.x != WIDTH-1{
-                index = position_to_index(self.x +1, self.y + 1);
-                if frame[index + 2] == 150{
-                    self.y += 1;
-                    self.x += 1;
-                    return;
-                }
-            }
-        }
-        else{
-            self.y += 1;
-            return;
-        }
-    }
-    fn colision(&self, frame: &mut [u8]) -> bool {
-        if self.y + 1 >= HEIGHT {
-            return true;
-        }
-        return false;
-    }
-}
-
-impl BaseParticle for Particle {
-    fn move_particle(&mut self, frame: &mut [u8]) {
-        if self.colision(frame) {
-            return;
-        }
-        self.y += 1
-    }
-
-    fn colision(&self, frame: &mut [u8]) -> bool {
-        if self.y + 1 >= HEIGHT {
-            return true;
-        }
-
-        let index: usize = position_to_index(self.x, self.y + 1);
-        if (frame[index + 2]) != self.rgba[2] {
-            return false;
-        } else {
-            return true;
-        }
-    }
-}
+mod implparticles;
 
 fn main() -> Result<(), Error> {
     env_logger::init();
@@ -205,12 +139,10 @@ fn main() -> Result<(), Error> {
                 }
   
         }    
-            //Resize the window
             if let Some(size) = input.window_resized() {
                 pixels.resize_surface(size.width, size.height).unwrap();
             }
 
-            // Update internal state and request a redraw
             update(particlevec.as_mut_slice(), pixels.get_frame_mut());
             window.request_redraw();
         }
@@ -236,7 +168,3 @@ pub fn draw(frame: &mut [u8], vec: Vec<SandParticle>) {
         //                                400 401 402 403          400
         //                                800 801 803 803 -
     }
-
-pub fn position_to_index(x: u32, y: u32) -> usize {
-    return ((y * WIDTH + x) * 4) as usize;
-}

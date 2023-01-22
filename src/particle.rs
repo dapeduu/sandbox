@@ -17,3 +17,9 @@ pub struct SandParticle{
     pub y: u32,
     pub rgba: [u8; 4],
 }
+
+pub trait BaseParticle {
+    fn move_particle(&mut self, frame: &mut [u8]);
+
+    fn colision(&self, frame: &mut [u8]) -> bool;
+}
