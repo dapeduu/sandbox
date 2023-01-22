@@ -7,31 +7,16 @@ use winit::event::{Event, VirtualKeyCode};
 use winit::event_loop::{ControlFlow, EventLoop};
 use winit::window::WindowBuilder;
 use winit_input_helper::WinitInputHelper;
+use std::process;
+mod particle;
+use particle::*;
 
 static WIDTH: u32 = 200;
 static HEIGHT: u32 = 150;
-static mut CLICKFLAG: bool = true;
 trait BaseParticle {
-    /// Handles the particle movement
     fn move_particle(&mut self, frame: &mut [u8]);
 
-    /// Colision checks on the screen borders and particles
-    /// Returns true if there is colision
     fn colision(&self, frame: &mut [u8]) -> bool;
-}
-
-#[derive(Clone)]
-struct Particle {
-    x: u32,
-    y: u32,
-    rgba: [u8; 4],
-}
-
-#[derive(Clone)]
-struct SandParticle{
-    x: u32,
-    y: u32,
-    rgba: [u8; 4],
 }
 
 impl BaseParticle for SandParticle{
@@ -62,25 +47,20 @@ impl BaseParticle for SandParticle{
             self.y += 1;
             return;
         }
-
     }
-
     fn colision(&self, frame: &mut [u8]) -> bool {
         if self.y + 1 >= HEIGHT {
             return true;
         }
         return false;
     }
-
 }
-
 
 impl BaseParticle for Particle {
     fn move_particle(&mut self, frame: &mut [u8]) {
         if self.colision(frame) {
             return;
         }
-
         self.y += 1
     }
 
@@ -100,6 +80,8 @@ impl BaseParticle for Particle {
 
 fn main() -> Result<(), Error> {
     env_logger::init();
+    let mut clickflag: bool = true;
+    let mut particlekey: i32 =0;
     let event_loop = EventLoop::new();
     let mut input = WinitInputHelper::new();
     let window = {
@@ -118,17 +100,52 @@ fn main() -> Result<(), Error> {
         let surface_texture = SurfaceTexture::new(window_size.width, window_size.height, &window);
         Pixels::new(WIDTH, HEIGHT, surface_texture)?
     };
-    let mut world = World::new();
     //pixels.set_clear_color([0,0,]);
 
     let mut particlevec: Vec<SandParticle> = Vec::new();
+
+
+    let mut particlevec2: Vec<ParticleType> = Vec::new();
+
+    // Teste vec de enums
+    /* 
+    let parteste1 = SandParticle {
+        x: 1 as u32,
+        y: 2 as u32,
+        rgba: [0xef, 0xef, 0x00, 0xff],
+    };
+    let parteste2 = Particle {
+        x: 3 as u32,
+        y: 4 as u32,
+        rgba: [0xef, 0xef, 0x00, 0xff],
+    };
+    
+    particlevec2.push(ParticleType::SandParticle(parteste1));
+    particlevec2.push(ParticleType::Particle(parteste2));
+
+    for partenum in particlevec2{
+        match partenum{
+            ParticleType::SandParticle(part)=> {
+                println!("{}", part.x);
+                        }
+            ParticleType::Particle(part) => {
+                println!("{}", part.x);
+            }
+        }
+    }
+
+    process::exit(1);
+
+    */
+    // Teste vec de enums
+
 
     event_loop.run(move |event, _, control_flow| {
         println!("Number of particles: {}", particlevec.len());
 
         // Draw the current frame
         if let Event::RedrawRequested(_) = event {
-            world.draw(pixels.get_frame_mut(), particlevec.clone());
+            draw(pixels.get_frame_mut(), particlevec.clone());
             if pixels
                 .render()
                 .map_err(|e| error!("pixels.render() failed: {}", e))
@@ -146,11 +163,11 @@ fn main() -> Result<(), Error> {
                 *control_flow = ControlFlow::Exit;
                 return;
             }
-            unsafe{
-                if input.key_pressed(VirtualKeyCode::P){
-                    CLICKFLAG = !CLICKFLAG;
+                
+            if input.key_pressed(VirtualKeyCode::P){
+                clickflag = !clickflag;
             }
-            if CLICKFLAG {
+            if clickflag {
                 if input.mouse_held(0) {
         
                     let mousepos = input.mouse().unwrap();
@@ -187,38 +204,25 @@ fn main() -> Result<(), Error> {
                     }
                 }
   
-        }
-    }
+        }    
             //Resize the window
             if let Some(size) = input.window_resized() {
                 pixels.resize_surface(size.width, size.height).unwrap();
             }
 
             // Update internal state and request a redraw
-            world.update(particlevec.as_mut_slice(), pixels.get_frame_mut());
+            update(particlevec.as_mut_slice(), pixels.get_frame_mut());
             window.request_redraw();
         }
     });
 }
-
-struct World {}
-impl World {
-    /// Create a new `World` instance that can draw a moving box.
-    fn new() -> Self {
-        Self {}
-    }
-
-    /// Update the `World` internal state; bounce the box around the screen.
-    fn update(&mut self, vec: &mut [SandParticle], frame: &mut [u8]) {
+pub fn update(vec: &mut [SandParticle], frame: &mut [u8]) {
         for particle in vec {
             particle.move_particle(frame);
         }
     }
 
-    /// Draw the `World` state to the frame buffer.
-    ///
-    /// Assumes the default texture format: `wgpu::TextureFormat::Rgba8UnormSrgb`
-    fn draw(&self, frame: &mut [u8], vec: Vec<SandParticle>) {
+pub fn draw(frame: &mut [u8], vec: Vec<SandParticle>) {
         //clear(frame);
         frame.fill(150);
         for particle in &vec {
@@ -232,7 +236,6 @@ impl World {
         //                                400 401 402 403          400
         //                                800 801 803 803 -
     }
-}
 
 pub fn position_to_index(x: u32, y: u32) -> usize {
     return ((y * WIDTH + x) * 4) as usize;
