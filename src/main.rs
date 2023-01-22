@@ -11,6 +11,7 @@ use std::process;
 mod particle;
 use particle::*;
 mod implparticles;
+use crate::implparticles::*;
 
 fn main() -> Result<(), Error> {
     env_logger::init();
@@ -28,7 +29,6 @@ fn main() -> Result<(), Error> {
             .build(&event_loop)
             .unwrap()
     };
-
     let mut pixels = {
         let window_size = window.inner_size();
         let surface_texture = SurfaceTexture::new(window_size.width, window_size.height, &window);
@@ -37,7 +37,6 @@ fn main() -> Result<(), Error> {
     //pixels.set_clear_color([0,0,]);
 
     let mut particlevec: Vec<SandParticle> = Vec::new();
-
 
     let mut particlevec2: Vec<ParticleType> = Vec::new();
 
@@ -72,7 +71,6 @@ fn main() -> Result<(), Error> {
 
     */
     // Teste vec de enums
-
 
     event_loop.run(move |event, _, control_flow| {
         println!("Number of particles: {}", particlevec.len());
@@ -160,11 +158,8 @@ pub fn draw(frame: &mut [u8], vec: Vec<SandParticle>) {
         for particle in &vec {
             let index: usize = position_to_index(particle.x, particle.y);
             frame[index] = particle.rgba[0]; //r
-            frame[index + 1] = particle.rgba[1]; //g
-            frame[index + 2] = particle.rgba[2]; //b
-            frame[index + 3] = particle.rgba[3]; //a
+            frame[index + 1] = particle.rgba[1]; //g    //[][][][][] WIDTH*Heigh /30000  0   1    2    3      --- 400
+            frame[index + 2] = particle.rgba[2]; //b    //                               400 401 402 403          400
+            frame[index + 3] = particle.rgba[3]; //a    //                               800 801 803 803 -
         }
-        //[][][][][] WIDTH*Heigh /30000  0   1    2    3      --- 400
-        //                                400 401 402 403          400
-        //                                800 801 803 803 -
     }

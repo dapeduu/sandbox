@@ -5,6 +5,12 @@ pub enum ParticleType{
 }
 
 #[derive(Copy,Clone)]
+pub enum ParticleNum{
+    Base,
+    Sand,
+}
+
+#[derive(Copy,Clone)]
 pub struct Particle {
     pub x: u32,
     pub y: u32,

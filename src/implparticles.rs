@@ -1,6 +1,6 @@
 use crate::*;
-static WIDTH: u32 = 200;
-static HEIGHT: u32 = 150;
+pub static WIDTH: u32 = 200;
+pub static HEIGHT: u32 = 150;
 
 pub fn position_to_index(x: u32, y: u32) -> usize {
     return ((y * WIDTH + x) * 4) as usize;
