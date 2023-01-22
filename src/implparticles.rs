@@ -63,3 +63,14 @@ impl BaseParticle for SandParticle {
         return false;
     }
 }
+
+impl BaseParticle for IronParticle {
+    fn move_particle(&mut self, frame: &mut [u8]) {
+        if self.colision(frame) {
+            return;
+        }
+    }
+    fn colision(&self, _frame: &mut [u8]) -> bool {
+        return false;
+    }
+}
