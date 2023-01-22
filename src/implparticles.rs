@@ -28,42 +28,38 @@ impl BaseParticle for Particle {
     }
 }
 
-
-
-impl BaseParticle for SandParticle{
-    fn move_particle(&mut self, frame: &mut [u8]){
+impl BaseParticle for SandParticle {
+    fn move_particle(&mut self, frame: &mut [u8]) {
         if self.colision(frame) {
             return;
         }
         let mut index: usize = position_to_index(self.x, self.y + 1);
-        if (frame[index + 2]) != 150{
-            if self.x != 0{
-                index = position_to_index(self.x -1, self.y + 1);
-                if frame[index + 2] == 150{
+        if (frame[index + 2]) != 150 {
+            if self.x != 0 {
+                index = position_to_index(self.x - 1, self.y + 1);
+                if frame[index + 2] == 150 {
                     self.y += 1;
                     self.x -= 1;
                     return;
                 }
             }
-            if self.x != WIDTH-1{
-                index = position_to_index(self.x +1, self.y + 1);
-                if frame[index + 2] == 150{
+            if self.x != WIDTH - 1 {
+                index = position_to_index(self.x + 1, self.y + 1);
+                if frame[index + 2] == 150 {
                     self.y += 1;
                     self.x += 1;
                     return;
                 }
             }
-        }
-        else{
+        } else {
             self.y += 1;
             return;
         }
     }
-    fn colision(&self, frame: &mut [u8]) -> bool {
+    fn colision(&self, _frame: &mut [u8]) -> bool {
         if self.y + 1 >= HEIGHT {
             return true;
         }
         return false;
     }
 }
-

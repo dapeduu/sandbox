@@ -1,24 +1,24 @@
-#[derive(Copy,Clone)]
-pub enum ParticleType{
+#[derive(Copy, Clone)]
+pub enum ParticleType {
     Particle(Particle),
-    SandParticle(SandParticle)
+    SandParticle(SandParticle),
 }
 
-#[derive(Copy,Clone)]
-pub enum ParticleNum{
+#[derive(Copy, Clone)]
+pub enum ParticleNum {
     Base,
     Sand,
 }
 
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct Particle {
     pub x: u32,
     pub y: u32,
     pub rgba: [u8; 4],
 }
 
-#[derive(Copy,Clone)]
-pub struct SandParticle{
+#[derive(Copy, Clone)]
+pub struct SandParticle {
     pub x: u32,
     pub y: u32,
     pub rgba: [u8; 4],

@@ -7,7 +7,6 @@ use winit::event::{Event, VirtualKeyCode};
 use winit::event_loop::{ControlFlow, EventLoop};
 use winit::window::WindowBuilder;
 use winit_input_helper::WinitInputHelper;
-use std::process;
 mod particle;
 use particle::*;
 mod implparticles;
@@ -16,7 +15,7 @@ use crate::implparticles::*;
 fn main() -> Result<(), Error> {
     env_logger::init();
     let mut clickflag: bool = true;
-    let mut particlekey: ParticleNum =ParticleNum::Sand;
+    let mut particlekey: ParticleNum = ParticleNum::Sand;
     let event_loop = EventLoop::new();
     let mut input = WinitInputHelper::new();
     let window = {
@@ -37,18 +36,21 @@ fn main() -> Result<(), Error> {
 
     let mut particlevec: Vec<ParticleType> = Vec::new();
 
-
     event_loop.run(move |event, _, control_flow| {
         println!("Number of particles: {}", particlevec.len());
 
         // Draw the current frame
         if let Event::RedrawRequested(_) = event {
             draw(pixels.get_frame_mut(), particlevec.clone());
-            if pixels.render().map_err(|e| error!("pixels.render() failed: {}", e)).is_err(){
+            if pixels
+                .render()
+                .map_err(|e| error!("pixels.render() failed: {}", e))
+                .is_err()
+            {
                 *control_flow = ControlFlow::Exit;
                 return;
             }
-        }      
+        }
 
         // Handle input events
         if input.update(&event) {
@@ -57,35 +59,38 @@ fn main() -> Result<(), Error> {
                 *control_flow = ControlFlow::Exit;
                 return;
             }
-                
-            if input.key_pressed(VirtualKeyCode::P){
+
+            if input.key_pressed(VirtualKeyCode::P) {
                 clickflag = !clickflag;
             }
-            if input.key_pressed(VirtualKeyCode::Key1){
+            if input.key_pressed(VirtualKeyCode::Key1) {
                 particlekey = ParticleNum::Base;
             }
-            if input.key_pressed(VirtualKeyCode::Key2){
+            if input.key_pressed(VirtualKeyCode::Key2) {
                 particlekey = ParticleNum::Sand;
             }
 
             if clickflag {
                 if input.mouse_held(0) {
                     let pixref = &mut pixels as *mut Pixels;
-                    match instanceparticle(&input,pixref,particlekey){
-                        Some(instancia)=>{ particlevec.push(instancia); }
+                    match instanceparticle(&input, pixref, particlekey) {
+                        Some(instancia) => {
+                            particlevec.push(instancia);
+                        }
+                        None => {}
+                    }
+                }
+            } else {
+                if input.mouse_pressed(0) {
+                    let pixref = &mut pixels as *mut Pixels;
+                    match instanceparticle(&input, pixref, particlekey) {
+                        Some(instancia) => {
+                            particlevec.push(instancia);
+                        }
                         None => {}
                     }
                 }
             }
-            else{
-                if input.mouse_pressed(0) {
-                    let pixref = &mut pixels as *mut Pixels;
-                    match instanceparticle(&input,pixref,particlekey){
-                        Some(instancia)=>{ particlevec.push(instancia); }
-                        None => {}
-                    }  
-                }
-            }    
             if let Some(size) = input.window_resized() {
                 pixels.resize_surface(size.width, size.height).unwrap();
             }
@@ -97,41 +102,46 @@ fn main() -> Result<(), Error> {
     });
 }
 
-pub fn instanceparticle(input: *const WinitInputHelper,pixels:*mut Pixels, particlekey: ParticleNum)->Option<ParticleType>{
-    unsafe{
-    let mousepos = (*input).mouse().unwrap(); 
-    let pixelpos = (*pixels).window_pos_to_pixel(mousepos).unwrap_or_else(|pos| (*pixels).clamp_pixel_pos(pos));
-    let index: usize = position_to_index(pixelpos.0 as u32, pixelpos.1 as u32);
-    let frame:&mut[u8] = (*pixels).get_frame_mut();
-    if (frame[index] == 150){
-        match particlekey{
-            ParticleNum::Base=>{
-                let novaparticula = Particle {
-                    x: pixelpos.0 as u32,
-                    y: pixelpos.1 as u32,
-                    rgba: [0x00, 0xef, 0x00, 0xff],
-                };
-                return Some((ParticleType::Particle(novaparticula)));
+pub fn instanceparticle(
+    input: *const WinitInputHelper,
+    pixels: *mut Pixels,
+    particlekey: ParticleNum,
+) -> Option<ParticleType> {
+    unsafe {
+        let mousepos = (*input).mouse().unwrap();
+        let pixelpos = (*pixels)
+            .window_pos_to_pixel(mousepos)
+            .unwrap_or_else(|pos| (*pixels).clamp_pixel_pos(pos));
+        let index: usize = position_to_index(pixelpos.0 as u32, pixelpos.1 as u32);
+        let frame: &mut [u8] = (*pixels).get_frame_mut();
+        if frame[index] == 150 {
+            match particlekey {
+                ParticleNum::Base => {
+                    let novaparticula = Particle {
+                        x: pixelpos.0 as u32,
+                        y: pixelpos.1 as u32,
+                        rgba: [0x00, 0xef, 0x00, 0xff],
+                    };
+                    return Some(ParticleType::Particle(novaparticula));
+                }
+                ParticleNum::Sand => {
+                    let novaparticula = SandParticle {
+                        x: pixelpos.0 as u32,
+                        y: pixelpos.1 as u32,
+                        rgba: [0xef, 0xef, 0x00, 0xff],
+                    };
+                    return Some(ParticleType::SandParticle(novaparticula));
+                }
             }
-            ParticleNum::Sand=>{
-                let novaparticula = SandParticle {
-                    x: pixelpos.0 as u32,
-                    y: pixelpos.1 as u32,
-                    rgba: [0xef, 0xef, 0x00, 0xff],
-                };
-                return Some((ParticleType::SandParticle(novaparticula)));
-            }
+        } else {
+            return None;
         }
     }
-    else{
-        return None;
-    }
-}
 }
 pub fn update(vec: &mut [ParticleType], frame: &mut [u8]) {
-    for partenum in vec{
-        match partenum{
-            ParticleType::SandParticle(part)=> {
+    for partenum in vec {
+        match partenum {
+            ParticleType::SandParticle(part) => {
                 part.move_particle(frame);
             }
             ParticleType::Particle(part) => {
@@ -142,28 +152,28 @@ pub fn update(vec: &mut [ParticleType], frame: &mut [u8]) {
 }
 
 pub fn draw(frame: &mut [u8], vec: Vec<ParticleType>) {
-        //clear(frame);
-        frame.fill(150);
+    //clear(frame);
+    frame.fill(150);
 
-        for partenum in vec{
-            match partenum{
-                ParticleType::SandParticle(part)=> {
-                    let index: usize = position_to_index(part.x, part.y);
-                    frame[index] = part.rgba[0];     //r
-                    frame[index + 1] = part.rgba[1]; //g    
-                    frame[index + 2] = part.rgba[2]; //b    
-                    frame[index + 3] = part.rgba[3]; //a   
-                }
-                ParticleType::Particle(part) => {
-                    let index: usize = position_to_index(part.x, part.y);
-                    frame[index] = part.rgba[0];     //r
-                    frame[index + 1] = part.rgba[1]; //g    
-                    frame[index + 2] = part.rgba[2]; //b    
-                    frame[index + 3] = part.rgba[3]; //a   
-                }
+    for partenum in vec {
+        match partenum {
+            ParticleType::SandParticle(part) => {
+                let index: usize = position_to_index(part.x, part.y);
+                frame[index] = part.rgba[0]; //r
+                frame[index + 1] = part.rgba[1]; //g
+                frame[index + 2] = part.rgba[2]; //b
+                frame[index + 3] = part.rgba[3]; //a
+            }
+            ParticleType::Particle(part) => {
+                let index: usize = position_to_index(part.x, part.y);
+                frame[index] = part.rgba[0]; //r
+                frame[index + 1] = part.rgba[1]; //g
+                frame[index + 2] = part.rgba[2]; //b
+                frame[index + 3] = part.rgba[3]; //a
             }
         }
-        //[][][][][] WIDTH*Heigh /30000  0   1    2    3      --- 400
-        //                               400 401 402 403          400
-        //                               800 801 803 803 -
     }
+    //[][][][][] WIDTH*Heigh /30000  0   1    2    3      --- 400
+    //                               400 401 402 403          400
+    //                               800 801 803 803 -
+}
