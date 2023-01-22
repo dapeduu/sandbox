@@ -131,7 +131,7 @@ pub fn instanceparticle(
                     let novaparticula = SandParticle {
                         x: pixelpos.0 as u32,
                         y: pixelpos.1 as u32,
-                        rgba: [0xef, 0xef, 0x00, 0xff],
+                        rgba: [0x96, 0x4b, 0x00, 0xff],
                     };
                     return Some(ParticleType::SandParticle(novaparticula));
                 }
