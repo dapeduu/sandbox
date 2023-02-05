@@ -1,3 +1,5 @@
+use winit::event::ElementState;
+use rand::Rng;
 use crate::*;
 pub static WIDTH: u32 = 200;
 pub static HEIGHT: u32 = 150;
@@ -120,4 +122,54 @@ impl BaseParticle for AcidParticle{
         }
         return false;
     }
+}
+
+impl BaseParticle for WaterParticle {
+    // Move para baixo se possível
+    // Caso contrário, move aleatoriamente para esquerda ou direita
+    // Objetivo: preencher todos os espaços do nível inferior
+
+        fn move_particle(&mut self, frame: &mut [u8]){
+            if self.colision(frame) {
+                return;
+            }
+            let index_down = position_to_index(self.x, self.y + 1);
+            if frame[index_down + 2] == 150 {
+                self.y += 1;
+            } else {
+                let mut new_x = self.x;
+                let mut new_y = self.y;
+                let direction = rand::thread_rng().gen_range(0, 2);
+                if self.x > 0 && direction == 0 {
+                    let index_left = position_to_index(self.x - 1, self.y);
+                    if frame[index_left + 2] == 150 {
+                        new_x = self.x - 1;
+                        new_y = self.y;
+                    }
+                }
+                if self.x < WIDTH - 1 && direction == 1 {
+                    let index_right = position_to_index(self.x + 1, self.y);
+                    if frame[index_right + 2] == 150 {
+                        new_x = self.x + 1;
+                        new_y = self.y;
+                    }
+                }
+                if new_x != self.x || new_y != self.y {
+                    self.x = new_x;
+                    self.y = new_y;
+                }
+            }
+
+
+
+        }
+    
+        fn colision(&self, frame: &mut [u8]) -> bool {
+            if self.y + 1 >= HEIGHT {
+                return true;
+            }
+            return false;
+    
+        }
+    
 }
