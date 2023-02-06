@@ -173,3 +173,49 @@ impl BaseParticle for WaterParticle {
         }
     
 }
+
+impl BaseParticle for AgitatedParticle {
+    //Inspirada no comportamento da partícula de água.
+    fn move_particle(&mut self, frame: &mut [u8]){
+        let direction = rand::thread_rng().gen_range(0, 4);
+        let mut new_x = self.x;
+        let mut new_y = self.y;
+        if direction == 0 && self.x > 0 {
+            let index_left = position_to_index(self.x - 1, self.y);
+            if frame[index_left + 2] == 150 {
+                new_x = self.x - 1;
+                new_y = self.y;
+            }
+        }
+        if direction == 1 && self.x < WIDTH - 1 {
+            let index_right = position_to_index(self.x + 1, self.y);
+            if frame[index_right + 2] == 150 {
+                new_x = self.x + 1;
+                new_y = self.y;
+            }
+        }
+        if direction == 2 && self.y > 0 {
+            let index_up = position_to_index(self.x, self.y - 1);
+            if frame[index_up + 2] == 150 {
+                new_x = self.x;
+                new_y = self.y - 1;
+            }
+        }
+        if direction == 3 && self.y < HEIGHT - 1 {
+            let index_down = position_to_index(self.x, self.y + 1);
+            if frame[index_down + 2] == 150 {
+                new_x = self.x;
+                new_y = self.y + 1;
+            }
+        }
+        if new_x != self.x || new_y != self.y {
+            self.x = new_x;
+            self.y = new_y;
+        }
+    }
+
+    fn colision(&self, frame: &mut [u8]) -> bool {
+        //Para que as partículas não grudem na borda, a colisão com a mesma é desconsiderada.
+        return false;
+    }
+}
