@@ -172,12 +172,19 @@ pub fn instanceparticle(
                     let novaparticula = AgitatedParticle {
                         x: pixelpos.0 as u32,
                         y: pixelpos.1 as u32,
-                        rgba: [0xff, 0xff, 0x00, 0xff],
+                        rgba: [0x16, 0x16, 0x00, 0xff],
                     };
                     return Some(ParticleType::AgitatedParticle(novaparticula));
                 }
-
-
+                ParticleNum::Electricity => {
+                    let novaparticula = ElectricityParticle {
+                        x: pixelpos.0 as u32,
+                        y: pixelpos.1 as u32,
+                        life_time: 5,
+                        rgba: [0xff, 0xff, 0x00, 0xff],
+                    };
+                    return Some(ParticleType::ElectricityParticle(novaparticula));
+                }
             }
         } else {
             return None;
@@ -203,6 +210,9 @@ pub fn update(vec: &mut [ParticleType], frame: &mut [u8]) {
                 part.move_particle(frame);
             }
             ParticleType::AgitatedParticle(part) => {
+                part.move_particle(frame);
+            }
+            ParticleType::ElectricityParticle(part) => {
                 part.move_particle(frame);
             }
         }
@@ -257,7 +267,13 @@ pub fn draw(frame: &mut [u8], vec: Vec<ParticleType>) {
                 frame[index + 2] = part.rgba[2]; //b
                 frame[index + 3] = part.rgba[3]; //a
             }
-            
+            ParticleType::ElectricityParticle(part) => {
+                let index: usize = position_to_index(part.x, part.y);
+                frame[index] = part.rgba[0]; //r
+                frame[index + 1] = part.rgba[1]; //g
+                frame[index + 2] = part.rgba[2]; //b
+                frame[index + 3] = part.rgba[3]; //a
+            }
         }
     }
     //[][][][][] WIDTH*Heigh /30000  0   1    2    3      --- 400

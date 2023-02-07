@@ -1,6 +1,5 @@
-use winit::event::ElementState;
-use rand::Rng;
 use crate::*;
+use rand::Rng;
 pub static WIDTH: u32 = 200;
 pub static HEIGHT: u32 = 150;
 
@@ -77,7 +76,7 @@ impl BaseParticle for IronParticle {
     }
 }
 
-impl BaseParticle for AcidParticle{
+impl BaseParticle for AcidParticle {
     //Casos para mover líquidos:
     //Mover para baixo se possível.
     //Mover para baixo e depois para esquerda ou direita aleatoriamente.
@@ -88,30 +87,29 @@ impl BaseParticle for AcidParticle{
     // }
 
     //Atualmente tem o mesmo comportamento da areia, mas apenas pra não dar ruim na hora de rodar o cargo run. Comportamento ainda será implementado.
-    fn move_particle(&mut self, frame: &mut [u8]){
+    fn move_particle(&mut self, frame: &mut [u8]) {
         if self.colision(frame) {
             return;
         }
         let mut index: usize = position_to_index(self.x, self.y + 1);
-        if (frame[index + 2]) != 150{
-            if self.x != 0{
-                index = position_to_index(self.x -1, self.y + 1);
-                if frame[index + 2] == 150{
+        if (frame[index + 2]) != 150 {
+            if self.x != 0 {
+                index = position_to_index(self.x - 1, self.y + 1);
+                if frame[index + 2] == 150 {
                     self.y += 1;
                     self.x -= 1;
                     return;
                 }
             }
-            if self.x != WIDTH-1{
-                index = position_to_index(self.x +1, self.y + 1);
-                if frame[index + 2] == 150{
+            if self.x != WIDTH - 1 {
+                index = position_to_index(self.x + 1, self.y + 1);
+                if frame[index + 2] == 150 {
                     self.y += 1;
                     self.x += 1;
                     return;
                 }
             }
-        }
-        else{
+        } else {
             self.y += 1;
             return;
         }
@@ -129,54 +127,49 @@ impl BaseParticle for WaterParticle {
     // Caso contrário, move aleatoriamente para esquerda ou direita
     // Objetivo: preencher todos os espaços do nível inferior
 
-        fn move_particle(&mut self, frame: &mut [u8]){
-            if self.colision(frame) {
-                return;
-            }
-            let index_down = position_to_index(self.x, self.y + 1);
-            if frame[index_down + 2] == 150 {
-                self.y += 1;
-            } else {
-                let mut new_x = self.x;
-                let mut new_y = self.y;
-                let direction = rand::thread_rng().gen_range(0, 2);
-                if self.x > 0 && direction == 0 {
-                    let index_left = position_to_index(self.x - 1, self.y);
-                    if frame[index_left + 2] == 150 {
-                        new_x = self.x - 1;
-                        new_y = self.y;
-                    }
-                }
-                if self.x < WIDTH - 1 && direction == 1 {
-                    let index_right = position_to_index(self.x + 1, self.y);
-                    if frame[index_right + 2] == 150 {
-                        new_x = self.x + 1;
-                        new_y = self.y;
-                    }
-                }
-                if new_x != self.x || new_y != self.y {
-                    self.x = new_x;
-                    self.y = new_y;
-                }
-            }
-
-
-
+    fn move_particle(&mut self, frame: &mut [u8]) {
+        if self.colision(frame) {
+            return;
         }
-    
-        fn colision(&self, frame: &mut [u8]) -> bool {
-            if self.y + 1 >= HEIGHT {
-                return true;
+        let index_down = position_to_index(self.x, self.y + 1);
+        if frame[index_down + 2] == 150 {
+            self.y += 1;
+        } else {
+            let mut new_x = self.x;
+            let mut new_y = self.y;
+            let direction = rand::thread_rng().gen_range(0, 2);
+            if self.x > 0 && direction == 0 {
+                let index_left = position_to_index(self.x - 1, self.y);
+                if frame[index_left + 2] == 150 {
+                    new_x = self.x - 1;
+                    new_y = self.y;
+                }
             }
-            return false;
-    
+            if self.x < WIDTH - 1 && direction == 1 {
+                let index_right = position_to_index(self.x + 1, self.y);
+                if frame[index_right + 2] == 150 {
+                    new_x = self.x + 1;
+                    new_y = self.y;
+                }
+            }
+            if new_x != self.x || new_y != self.y {
+                self.x = new_x;
+                self.y = new_y;
+            }
         }
-    
+    }
+
+    fn colision(&self, frame: &mut [u8]) -> bool {
+        if self.y + 1 >= HEIGHT {
+            return true;
+        }
+        return false;
+    }
 }
 
 impl BaseParticle for AgitatedParticle {
     //Inspirada no comportamento da partícula de água.
-    fn move_particle(&mut self, frame: &mut [u8]){
+    fn move_particle(&mut self, frame: &mut [u8]) {
         let direction = rand::thread_rng().gen_range(0, 4);
         let mut new_x = self.x;
         let mut new_y = self.y;
@@ -217,5 +210,27 @@ impl BaseParticle for AgitatedParticle {
     fn colision(&self, frame: &mut [u8]) -> bool {
         //Para que as partículas não grudem na borda, a colisão com a mesma é desconsiderada.
         return false;
+    }
+}
+
+impl BaseParticle for ElectricityParticle {
+    fn move_particle(&mut self, frame: &mut [u8]) {
+        if self.colision(frame) {
+            return;
+        }
+        self.y += 1
+    }
+
+    fn colision(&self, frame: &mut [u8]) -> bool {
+        if self.y + 1 >= HEIGHT {
+            return true;
+        }
+
+        let index: usize = position_to_index(self.x, self.y + 1);
+        if (frame[index + 2]) == 150 {
+            return false;
+        } else {
+            return true;
+        }
     }
 }
