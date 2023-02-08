@@ -81,6 +81,9 @@ fn main() -> Result<(), Error> {
             if input.key_pressed(VirtualKeyCode::Key6) {
                 particlekey = ParticleNum::Agitated;
             }
+            if input.key_pressed(VirtualKeyCode::Key7) {
+                particlekey = ParticleNum::Electricity;
+            }
 
             if clickflag {
                 if input.mouse_held(0) {
@@ -126,6 +129,7 @@ pub fn instanceparticle(
             .unwrap_or_else(|pos| (*pixels).clamp_pixel_pos(pos));
         let index: usize = position_to_index(pixelpos.0 as u32, pixelpos.1 as u32);
         let frame: &mut [u8] = (*pixels).get_frame_mut();
+
         if frame[index] == 150 {
             match particlekey {
                 ParticleNum::Base => {
@@ -187,6 +191,7 @@ pub fn instanceparticle(
                 }
             }
         } else {
+            println!("Cant instatiate particle here");
             return None;
         }
     }

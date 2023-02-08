@@ -215,22 +215,64 @@ impl BaseParticle for AgitatedParticle {
 
 impl BaseParticle for ElectricityParticle {
     fn move_particle(&mut self, frame: &mut [u8]) {
+        if self.life_time <= 1 {
+            self.life_time -= 1;
+        }
+
         if self.colision(frame) {
             return;
         }
-        self.y += 1
+
+        let right_index: usize = position_to_index(self.x + 1, self.y);
+        let left_index: usize = position_to_index(self.x - 1, self.y);
+        let up_index: usize = position_to_index(self.x, self.y - 1);
+        let bottom_index: usize = position_to_index(self.x, self.y + 1);
+
+        let next_moves = [
+            (right_index, (self.x + 1, self.y)),
+            (left_index, (self.x - 1, self.y)),
+            (up_index, (self.x, self.y - 1)),
+            (bottom_index, (self.x, self.y + 1)),
+        ];
+        let mut next_moves_max_len = next_moves.len();
+        let mut next_position = (self.x, self.y);
+
+        loop {
+            if next_moves_max_len == 0 {
+                break;
+            }
+
+            let direction = rand::thread_rng().gen_range(0, next_moves_max_len);
+            let (index, new_position) = next_moves[direction];
+
+            println!("{}", direction);
+
+            let is_on_water = frame[index] == 0x00 // R
+                && frame[index + 1] == 0x00 // G
+                && frame[index + 2] == 0xff // B
+                && frame[index + 3] == 0xff; // A
+
+            let is_on_metal = frame[index] == 0xff // R
+            && frame[index + 1] == 0x80 // G
+            && frame[index + 2] == 0x80 // B
+            && frame[index + 3] == 0x80; // A
+
+            let is_on_background = frame[index + 2] == 150;
+
+            if (is_on_water || is_on_metal || is_on_background) {
+                next_position = new_position;
+                break;
+            }
+
+            next_moves_max_len -= 1;
+        }
+
+        let (new_x, new_y) = next_position;
+        self.x = new_x;
+        self.y = new_y;
     }
 
-    fn colision(&self, frame: &mut [u8]) -> bool {
-        if self.y + 1 >= HEIGHT {
-            return true;
-        }
-
-        let index: usize = position_to_index(self.x, self.y + 1);
-        if (frame[index + 2]) == 150 {
-            return false;
-        } else {
-            return true;
-        }
+    fn colision(&self, _: &mut [u8]) -> bool {
+        return false;
     }
 }
