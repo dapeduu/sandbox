@@ -114,7 +114,7 @@ impl BaseParticle for AcidParticle {
             return;
         }
     }
-    fn colision(&self, frame: &mut [u8]) -> bool {
+    fn colision(&self, _: &mut [u8]) -> bool {
         if self.y + 1 >= HEIGHT {
             return true;
         }
@@ -159,7 +159,7 @@ impl BaseParticle for WaterParticle {
         }
     }
 
-    fn colision(&self, frame: &mut [u8]) -> bool {
+    fn colision(&self, _: &mut [u8]) -> bool {
         if self.y + 1 >= HEIGHT {
             return true;
         }
@@ -207,7 +207,7 @@ impl BaseParticle for AgitatedParticle {
         }
     }
 
-    fn colision(&self, frame: &mut [u8]) -> bool {
+    fn colision(&self, _: &mut [u8]) -> bool {
         //Para que as partículas não grudem na borda, a colisão com a mesma é desconsiderada.
         return false;
     }
@@ -259,7 +259,7 @@ impl BaseParticle for ElectricityParticle {
 
             let is_on_background = frame[index + 2] == 150;
 
-            if (is_on_water || is_on_metal || is_on_background) {
+            if is_on_water || is_on_metal || is_on_background {
                 next_position = new_position;
                 break;
             }
