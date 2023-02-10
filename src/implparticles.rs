@@ -230,13 +230,12 @@ impl BaseParticle for ElectricityParticle {
                 && frame[index + 2] == 0x80 // B
                 && frame[index + 3] == 0x80; // A
 
-            let is_on_background = frame[index + 2] == 150;
-
-            return is_on_water || is_on_metal || is_on_background;
+            return is_on_water || is_on_metal;
         }
 
         if direction == 0 && self.x > 0 {
             let index_left = position_to_index(self.x - 1, self.y);
+
             if is_on_conducting_element(frame, index_left) {
                 new_x = self.x - 1;
                 new_y = self.y;

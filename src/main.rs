@@ -130,69 +130,127 @@ pub fn instanceparticle(
         let index: usize = position_to_index(pixelpos.0 as u32, pixelpos.1 as u32);
         let frame: &mut [u8] = (*pixels).get_frame_mut();
 
-        if frame[index] == 150 {
-            match particlekey {
-                ParticleNum::Base => {
-                    let novaparticula = Particle {
-                        x: pixelpos.0 as u32,
-                        y: pixelpos.1 as u32,
-                        rgba: [0x00, 0xef, 0x00, 0xff],
-                    };
-                    return Some(ParticleType::Particle(novaparticula));
+        match particlekey {
+            ParticleNum::Base => {
+                let is_on_base = frame[index] == 0x00 // R
+                    && frame[index + 1] == 0xef // G
+                    && frame[index + 2] == 0x00 // B
+                    && frame[index + 3] == 0xff; // A
+
+                if is_on_base {
+                    return None;
                 }
-                ParticleNum::Sand => {
-                    let novaparticula = SandParticle {
-                        x: pixelpos.0 as u32,
-                        y: pixelpos.1 as u32,
-                        rgba: [0x96, 0x4b, 0x00, 0xff],
-                    };
-                    return Some(ParticleType::SandParticle(novaparticula));
-                }
-                ParticleNum::Iron => {
-                    let novaparticula = IronParticle {
-                        x: pixelpos.0 as u32,
-                        y: pixelpos.1 as u32,
-                        rgba: [0x80, 0x80, 0x80, 0xff],
-                    };
-                    return Some(ParticleType::IronParticle(novaparticula));
-                }
-                ParticleNum::Acid => {
-                    let novaparticula = AcidParticle {
-                        x: pixelpos.0 as u32,
-                        y: pixelpos.1 as u32,
-                        rgba: [0x0, 0x80, 0x0, 0xff],
-                    };
-                    return Some(ParticleType::AcidParticle(novaparticula));
-                }
-                ParticleNum::Water => {
-                    let novaparticula = WaterParticle {
-                        x: pixelpos.0 as u32,
-                        y: pixelpos.1 as u32,
-                        rgba: [0x0, 0x0, 0xff, 0xff],
-                    };
-                    return Some(ParticleType::WaterParticle(novaparticula));
-                }
-                ParticleNum::Agitated => {
-                    let novaparticula = AgitatedParticle {
-                        x: pixelpos.0 as u32,
-                        y: pixelpos.1 as u32,
-                        rgba: [0x16, 0x16, 0x00, 0xff],
-                    };
-                    return Some(ParticleType::AgitatedParticle(novaparticula));
-                }
-                ParticleNum::Electricity => {
-                    let novaparticula = ElectricityParticle {
-                        x: pixelpos.0 as u32,
-                        y: pixelpos.1 as u32,
-                        life_time: 5,
-                        rgba: [0xff, 0xff, 0x00, 0xff],
-                    };
-                    return Some(ParticleType::ElectricityParticle(novaparticula));
-                }
+
+                let novaparticula = Particle {
+                    x: pixelpos.0 as u32,
+                    y: pixelpos.1 as u32,
+                    rgba: [0x00, 0xef, 0x00, 0xff],
+                };
+                return Some(ParticleType::Particle(novaparticula));
             }
-        } else {
-            println!("Cant instatiate particle here");
-            return None;
+            ParticleNum::Sand => {
+                let is_on_sand = frame[index] == 0x96 // R
+                    && frame[index + 1] == 0x4b // G
+                    && frame[index + 2] == 0x00 // B
+                    && frame[index + 3] == 0xff; // A
+
+                if is_on_sand {
+                    return None;
+                }
+
+                let novaparticula = SandParticle {
+                    x: pixelpos.0 as u32,
+                    y: pixelpos.1 as u32,
+                    rgba: [0x96, 0x4b, 0x00, 0xff],
+                };
+                return Some(ParticleType::SandParticle(novaparticula));
+            }
+            ParticleNum::Iron => {
+                let is_on_iron = frame[index] == 0x80 // R
+                && frame[index + 1] == 0x80 // G
+                && frame[index + 2] == 0x80 // B
+                && frame[index + 3] == 0xff; // A
+
+                if is_on_iron {
+                    return None;
+                }
+
+                let novaparticula = IronParticle {
+                    x: pixelpos.0 as u32,
+                    y: pixelpos.1 as u32,
+                    rgba: [0x80, 0x80, 0x80, 0xff],
+                };
+                return Some(ParticleType::IronParticle(novaparticula));
+            }
+            ParticleNum::Acid => {
+                let is_on_acid = frame[index] == 0x0 // R
+                    && frame[index + 1] == 0x80 // G
+                    && frame[index + 2] == 0x0 // B
+                    && frame[index + 3] == 0xff; // A
+
+                if is_on_acid {
+                    return None;
+                }
+
+                let novaparticula = AcidParticle {
+                    x: pixelpos.0 as u32,
+                    y: pixelpos.1 as u32,
+                    rgba: [0x0, 0x80, 0x0, 0xff],
+                };
+                return Some(ParticleType::AcidParticle(novaparticula));
+            }
+            ParticleNum::Water => {
+                let is_on_water = frame[index] == 0x0 // R
+                    && frame[index + 1] == 0x0 // G
+                    && frame[index + 2] == 0xff // B
+                    && frame[index + 3] == 0xff; // A
+
+                if is_on_water {
+                    return None;
+                }
+
+                let novaparticula = WaterParticle {
+                    x: pixelpos.0 as u32,
+                    y: pixelpos.1 as u32,
+                    rgba: [0x0, 0x0, 0xff, 0xff],
+                };
+                return Some(ParticleType::WaterParticle(novaparticula));
+            }
+            ParticleNum::Agitated => {
+                let is_on_agitated = frame[index] == 0x16 // R
+                    && frame[index + 1] == 0x16 // G
+                    && frame[index + 2] == 0x00 // B
+                    && frame[index + 3] == 0xff; // A
+
+                if is_on_agitated {
+                    return None;
+                }
+
+                let novaparticula = AgitatedParticle {
+                    x: pixelpos.0 as u32,
+                    y: pixelpos.1 as u32,
+                    rgba: [0x16, 0x16, 0x00, 0xff],
+                };
+                return Some(ParticleType::AgitatedParticle(novaparticula));
+            }
+            ParticleNum::Electricity => {
+                let is_on_electricity = frame[index] == 0xff // R
+                    && frame[index + 1] == 0xff // G
+                    && frame[index + 2] == 0x00 // B
+                    && frame[index + 3] == 0xff; // A
+
+                if is_on_electricity {
+                    return None;
+                }
+
+                let novaparticula = ElectricityParticle {
+                    x: pixelpos.0 as u32,
+                    y: pixelpos.1 as u32,
+                    life_time: 5,
+                    rgba: [0xff, 0xff, 0x00, 0xff],
+                };
+                return Some(ParticleType::ElectricityParticle(novaparticula));
+            }
         }
     }
 }
