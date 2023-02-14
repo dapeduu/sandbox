@@ -29,10 +29,30 @@ fn main() -> Result<(), Error> {
     //! 
     //! # Input
     //! 
-    //! # Update
+    //! Para o input é utilizado um handler que verifica os "eventos" da janela, caso uma tecla seja pressionada é tratada de acordo com o que a tecla representa,
+    //! seja uma mudança para um tipo de partícula, fechamento da janela ou outra funcionalidade como o clique para instanciar partículas
     //! 
-    //! # Renderização
+    //! ```
+    //! if input.update(&event) {
+    //!     if input.key_pressed(VirtualKeyCode::Escape) || input.quit() {
+    //!         *control_flow = ControlFlow::Exit;
+    //!         return;
+    //!     }
+    //!     if input.key_pressed(VirtualKeyCode::P) {
+    //!         clickflag = !clickflag;
+    //!     }
+    //!     if input.key_pressed(VirtualKeyCode::Key1) {
+    //!         particlekey = ParticleNum::Base;
+    //!     }
+    //!     if input.key_pressed(VirtualKeyCode::Key2) {
+    //!         particlekey = ParticleNum::Sand;
+    //!     }
+    //! }
+    //! ```
     //! 
+    //! # Update & Renderização
+    //! 
+    //! Respectivamente ocorrem chamadas para as funções [update] e [draw] para execução desses trechos.
     env_logger::init();
     let mut clickflag: bool = true;
     let mut particlekey: ParticleNum = ParticleNum::Sand;

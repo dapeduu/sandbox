@@ -8,7 +8,7 @@ pub static HEIGHT: u32 = 150;
 
 /// Mapeia uma posição na tela a um índice de píxel no frame da tela
 /// 
-/// Um frame da tela codifica os pixels como um array, encadeando suas componentes rgba.
+/// Um frame da tela codifica os pixels como um array, unidimensional encadeando suas componentes rgba.
 /// Dessa forma o píxel 0,0 possui suas componentes r,g,b,a respecitvamente nos índices 0,1,2,3 enquanto que o píxel 1,0, tem suas componentes nos índices 4,5,6,7
 /// de acordo com a largura e altura da janela.
 /// 
