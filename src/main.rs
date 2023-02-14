@@ -14,6 +14,10 @@ mod implparticles;
 use crate::implparticles::*;
 
 fn main() -> Result<(), Error> {
+    //! Execução Prinicipal
+    //! 
+    //! A main pode ser dividida em 4 partes, inicialização, input,update,renderização, sendo as 3 últimas rodadas em loop
+    //! 
     env_logger::init();
     let mut clickflag: bool = true;
     let mut particlekey: ParticleNum = ParticleNum::Sand;
@@ -117,6 +121,35 @@ fn main() -> Result<(), Error> {
         }
     });
 }
+
+/// Instancia partículas
+/// 
+/// Inicialmente pega as coordenadas do mouse e utiliza [position_to_index] para associar ao frame
+/// ```
+/// let mousepos = (*input).mouse().unwrap();
+/// let pixelpos = (*pixels).window_pos_to_pixel(mousepos).unwrap_or_else(|pos| (*pixels).clamp_pixel_pos(pos));
+/// let index: usize = position_to_index(pixelpos.0 as u32, pixelpos.1 as u32);
+/// ```
+/// 
+/// Em seguida, verifica se a partícula que vai ser instanciada não irá sobrepor outra do mesmo tipo devido a velocidade do processamento,
+/// após isso cria e retorna a nova partícula com as novas coordenadas e seus valores de cores
+/// ```
+/// ParticleNum::Sand => {
+///     let is_on_sand = frame[index] == 0x96 // R
+///     && frame[index + 1] == 0x4b // G
+///     && frame[index + 2] == 0x00 // B
+///     && frame[index + 3] == 0xff; // A
+///     if is_on_sand {
+///     return None;
+///     }
+///     let novaparticula = SandParticle {
+///     x: pixelpos.0 as u32,
+///     y: pixelpos.1 as u32,
+///     rgba: [0x96, 0x4b, 0x00, 0xff],
+///     };
+///     return Some(ParticleType::SandParticle(novaparticula));
+/// }
+/// ```
 
 pub fn instanceparticle(
     input: *const WinitInputHelper,
@@ -255,6 +288,19 @@ pub fn instanceparticle(
         }
     }
 }
+
+/// Atualiza as partículas;
+/// 
+/// Para cada partícula do vetor realiza o match de acordo com o tipo e chama sua função de movimentação
+/// ```text
+///     for partenum in vec {
+///         match partenum {
+///             ParticleType::SandParticle(part) => {
+///                 part.move_particle(frame);
+///                 }
+///          ...
+///          ...
+/// ```
 pub fn update(vec: &mut [ParticleType], frame: &mut [u8]) {
     for partenum in vec {
         match partenum {
@@ -283,8 +329,7 @@ pub fn update(vec: &mut [ParticleType], frame: &mut [u8]) {
     }
 }
 
-/// Renderização na tela
-/// Recebe o Frame da tela e o Vetor de partículas contendo todas as partículas instanciadas
+/// Renderização na tela.
 /// 
 /// Inicialmente limpa a tela, preenchendo todos os componentes dos pixels com o valor 150
 /// ```

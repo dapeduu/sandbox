@@ -1,4 +1,13 @@
 //! Definição das Structs para cada Partícula, declaração das traits básicas de movimento e colisão, definição de Enums para os tipos das partículas.
+//! 
+//! Toda Partícula possui a mesma estrutura base, contendo posições x,y e uma cor
+//! ```
+//! pub struct Particle {
+//!     pub x: u32,
+//!     pub y: u32,
+//!     pub rgba: [u8; 4],
+//! }
+//! ```
 
 ///Enumeration Tipada, constructo específico do rust que se comporta como uma Union de C, utilizada para construir um vetor heterogêneo de partículas
 #[derive(Copy, Clone)]

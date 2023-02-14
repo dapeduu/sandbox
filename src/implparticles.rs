@@ -1,9 +1,28 @@
 //! Implementação das traits [base](BaseParticle) para cada partícula e definição de [position_to_index]
 use crate::*;
 use rand::Rng;
+///Largura Tela
 pub static WIDTH: u32 = 200;
+///Altura Tela
 pub static HEIGHT: u32 = 150;
 
+/// Mapeia uma posição na tela a um índice de píxel no frame da tela
+/// 
+/// Um frame da tela codifica os pixels como um array, encadeando suas componentes rgba.
+/// Dessa forma o píxel 0,0 possui suas componentes r,g,b,a respecitvamente nos índices 0,1,2,3 enquanto que o píxel 1,0, tem suas componentes nos índices 4,5,6,7
+/// de acordo com a largura e altura da janela.
+/// 
+/// Exemplo com largura 400
+/// ```text 
+/// (0   1    2    3) (4    5   6   7)  ...
+/// (400 401 402 403)  ...
+/// (800 801 802 803)  ... 
+/// ```
+/// Sendo assim, a função calcula a "linha" a partir de y, e a "coluna" para o píxel a partir de x, retornando o índice da componente r, na qual os próximos 3
+/// serão os outros componentes.
+/// ```
+/// return ((y * WIDTH + x) * 4) as usize;
+/// ```
 pub fn position_to_index(x: u32, y: u32) -> usize {
     return ((y * WIDTH + x) * 4) as usize;
 }
