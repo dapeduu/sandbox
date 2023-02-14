@@ -18,6 +18,21 @@ fn main() -> Result<(), Error> {
     //! 
     //! A main pode ser dividida em 4 partes, inicialização, input,update,renderização, sendo as 3 últimas rodadas em loop
     //! 
+    //! # Inicialização
+    //! 
+    //! A inicialização cria os handlers de input e janela das bibliotecas utilizadas e define certas flags como a partícula inicial e o modo de clique(rápido ou individual)
+    //! ```
+    //! let mut clickflag: bool = true;
+    //! let event_loop = EventLoop::new();
+    //! let mut input = WinitInputHelper::new();
+    //! ```
+    //! 
+    //! # Input
+    //! 
+    //! # Update
+    //! 
+    //! # Renderização
+    //! 
     env_logger::init();
     let mut clickflag: bool = true;
     let mut particlekey: ParticleNum = ParticleNum::Sand;
@@ -40,9 +55,9 @@ fn main() -> Result<(), Error> {
     };
 
     let mut particlevec: Vec<ParticleType> = Vec::new();
-
+    println!("1: Base ; 2: Areia ; 3: Ferro ; 4: ; 5: ; 6: ");
     event_loop.run(move |event, _, control_flow| {
-        println!("Number of particles: {}", particlevec.len());
+        // println!("Number of particles: {}", particlevec.len());
 
         // Draw the current frame
         if let Event::RedrawRequested(_) = event {
@@ -122,7 +137,7 @@ fn main() -> Result<(), Error> {
     });
 }
 
-/// Instancia partículas
+/// # Instanciação de Partículas
 /// 
 /// Inicialmente pega as coordenadas do mouse e utiliza [position_to_index] para associar ao frame
 /// ```
@@ -289,7 +304,7 @@ pub fn instanceparticle(
     }
 }
 
-/// Atualiza as partículas;
+/// # Atualização de Partículas
 /// 
 /// Para cada partícula do vetor realiza o match de acordo com o tipo e chama sua função de movimentação
 /// ```text
@@ -329,7 +344,7 @@ pub fn update(vec: &mut [ParticleType], frame: &mut [u8]) {
     }
 }
 
-/// Renderização na tela.
+/// # Renderização
 /// 
 /// Inicialmente limpa a tela, preenchendo todos os componentes dos pixels com o valor 150
 /// ```
