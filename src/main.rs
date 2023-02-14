@@ -1,12 +1,12 @@
 //! Módulo principal, Lógica de execução, renderização, inicialização e chamada às funções.
-//! 
+//!
 //! # Bibliotecas e extras
 //! Para realização do projeto, utilizamos a biblioteca Pixels <https://docs.rs/pixels/latest/pixels/> para abstrair a necessidade de criação de shaders com o wgpu, permitindo
-//! uma renderização mais simplificada. Para o Handling de entrada e criação de janelas, foi utilizada a biblioteca winit, <https://docs.rs/winit/latest/winit/> , que 
+//! uma renderização mais simplificada. Para o Handling de entrada e criação de janelas, foi utilizada a biblioteca winit, <https://docs.rs/winit/latest/winit/> , que
 //! permite tratar input e realizar a criação de janelas mais diretamente.
-//! 
+//!
 //! Além disso, para o processo de documentação e criação dessa wiki, foi utilizada a feature do cargo docs, o qual permite uma criação de documentação próxima a do Doxygen.
-//! 
+//!
 #![deny(clippy::all)]
 
 use log::error;
@@ -23,23 +23,23 @@ use crate::implparticles::*;
 
 fn main() -> Result<(), Error> {
     //! Execução Prinicipal
-    //! 
+    //!
     //! A main pode ser dividida em 4 partes, inicialização, input,update,renderização, sendo as 3 últimas rodadas em loop
-    //! 
+    //!
     //! # Inicialização
-    //! 
+    //!
     //! A inicialização cria os handlers de input e janela das bibliotecas utilizadas e define certas flags como a partícula inicial e o modo de clique(rápido ou individual)
     //! ```
     //! let mut clickflag: bool = true;
     //! let event_loop = EventLoop::new();
     //! let mut input = WinitInputHelper::new();
     //! ```
-    //! 
+    //!
     //! # Input
-    //! 
+    //!
     //! Para o input é utilizado um handler que verifica os "eventos" da janela, caso uma tecla seja pressionada é tratada de acordo com o que a tecla representa,
     //! seja uma mudança para um tipo de partícula, fechamento da janela ou outra funcionalidade como o clique para instanciar partículas
-    //! 
+    //!
     //! ```
     //! if input.update(&event) {
     //!     if input.key_pressed(VirtualKeyCode::Escape) || input.quit() {
@@ -57,9 +57,9 @@ fn main() -> Result<(), Error> {
     //!     }
     //! }
     //! ```
-    //! 
+    //!
     //! # Update & Renderização
-    //! 
+    //!
     //! Respectivamente ocorrem chamadas para as funções [update] e [draw] para execução desses trechos.
     env_logger::init();
     let mut clickflag: bool = true;
@@ -124,10 +124,13 @@ fn main() -> Result<(), Error> {
                 particlekey = ParticleNum::Water;
             }
             if input.key_pressed(VirtualKeyCode::Key5) {
-                particlekey = ParticleNum::Agitated;
+                particlekey = ParticleNum::Insect;
             }
             if input.key_pressed(VirtualKeyCode::Key6) {
                 particlekey = ParticleNum::Electricity;
+            }
+            if input.key_pressed(VirtualKeyCode::C) {
+                particlevec.clear();
             }
 
             if clickflag {
@@ -163,14 +166,14 @@ fn main() -> Result<(), Error> {
 }
 
 /// # Instanciação de Partículas
-/// 
+///
 /// Inicialmente pega as coordenadas do mouse e utiliza [position_to_index] para associar ao frame
 /// ```
 /// let mousepos = (*input).mouse().unwrap();
 /// let pixelpos = (*pixels).window_pos_to_pixel(mousepos).unwrap_or_else(|pos| (*pixels).clamp_pixel_pos(pos));
 /// let index: usize = position_to_index(pixelpos.0 as u32, pixelpos.1 as u32);
 /// ```
-/// 
+///
 /// Em seguida, verifica se a partícula que vai ser instanciada não irá sobrepor outra do mesmo tipo devido a velocidade do processamento,
 /// após isso cria e retorna a nova partícula com as novas coordenadas e seus valores de cores
 /// ```
@@ -273,7 +276,7 @@ pub fn instanceparticle(
                 };
                 return Some(ParticleType::WaterParticle(novaparticula));
             }
-            ParticleNum::Agitated => {
+            ParticleNum::Insect => {
                 let is_on_agitated = frame[index] == 0x16 // R
                     && frame[index + 1] == 0x16 // G
                     && frame[index + 2] == 0x00 // B
@@ -313,7 +316,7 @@ pub fn instanceparticle(
 }
 
 /// # Atualização de Partículas
-/// 
+///
 /// Para cada partícula do vetor realiza o match de acordo com o tipo e chama sua função de movimentação
 /// ```text
 ///     for partenum in vec {
@@ -350,15 +353,15 @@ pub fn update(vec: &mut [ParticleType], frame: &mut [u8]) {
 }
 
 /// # Renderização
-/// 
+///
 /// Inicialmente limpa a tela, preenchendo todos os componentes dos pixels com o valor 150
 /// ```
 /// frame.fill(150);
 /// ```
-/// 
+///
 /// Em seguida, para cada partícula instanciada, dá match de acordo com seu tipo, utiliza [position_to_index] para pegar os valores de posição
 /// da partícula e associar a índices no frame, em seguida preenche as componetes rgba do píxel de acordo com as cores da partícula
-/// 
+///
 /// ```
 /// ParticleType::SandParticle(part) => {
 ///     let index: usize = position_to_index(part.x, part.y);
@@ -368,7 +371,7 @@ pub fn update(vec: &mut [ParticleType], frame: &mut [u8]) {
 ///     frame[index + 3] = part.rgba[3]; //a
 ///     }
 /// ```
-/// 
+///
 pub fn draw(frame: &mut [u8], vec: Vec<ParticleType>) {
     //clear(frame);
     frame.fill(150);
@@ -419,5 +422,4 @@ pub fn draw(frame: &mut [u8], vec: Vec<ParticleType>) {
             }
         }
     }
-
 }
