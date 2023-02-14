@@ -113,15 +113,12 @@ fn main() -> Result<(), Error> {
                 particlekey = ParticleNum::Iron;
             }
             if input.key_pressed(VirtualKeyCode::Key4) {
-                particlekey = ParticleNum::Acid;
-            }
-            if input.key_pressed(VirtualKeyCode::Key5) {
                 particlekey = ParticleNum::Water;
             }
-            if input.key_pressed(VirtualKeyCode::Key6) {
+            if input.key_pressed(VirtualKeyCode::Key5) {
                 particlekey = ParticleNum::Agitated;
             }
-            if input.key_pressed(VirtualKeyCode::Key7) {
+            if input.key_pressed(VirtualKeyCode::Key6) {
                 particlekey = ParticleNum::Electricity;
             }
 
@@ -251,23 +248,6 @@ pub fn instanceparticle(
                 };
                 return Some(ParticleType::IronParticle(novaparticula));
             }
-            ParticleNum::Acid => {
-                let is_on_acid = frame[index] == 0x0 // R
-                    && frame[index + 1] == 0x80 // G
-                    && frame[index + 2] == 0x0 // B
-                    && frame[index + 3] == 0xff; // A
-
-                if is_on_acid {
-                    return None;
-                }
-
-                let novaparticula = AcidParticle {
-                    x: pixelpos.0 as u32,
-                    y: pixelpos.1 as u32,
-                    rgba: [0x0, 0x80, 0x0, 0xff],
-                };
-                return Some(ParticleType::AcidParticle(novaparticula));
-            }
             ParticleNum::Water => {
                 let is_on_water = frame[index] == 0x0 // R
                     && frame[index + 1] == 0x0 // G
@@ -348,9 +328,6 @@ pub fn update(vec: &mut [ParticleType], frame: &mut [u8]) {
             ParticleType::IronParticle(part) => {
                 part.move_particle(frame);
             }
-            ParticleType::AcidParticle(part) => {
-                part.move_particle(frame);
-            }
             ParticleType::WaterParticle(part) => {
                 part.move_particle(frame);
             }
@@ -405,13 +382,6 @@ pub fn draw(frame: &mut [u8], vec: Vec<ParticleType>) {
                 frame[index + 3] = part.rgba[3]; //a
             }
             ParticleType::IronParticle(part) => {
-                let index: usize = position_to_index(part.x, part.y);
-                frame[index] = part.rgba[0]; //r
-                frame[index + 1] = part.rgba[1]; //g
-                frame[index + 2] = part.rgba[2]; //b
-                frame[index + 3] = part.rgba[3]; //a
-            }
-            ParticleType::AcidParticle(part) => {
                 let index: usize = position_to_index(part.x, part.y);
                 frame[index] = part.rgba[0]; //r
                 frame[index + 1] = part.rgba[1]; //g

@@ -15,7 +15,6 @@ pub enum ParticleType {
     Particle(Particle),
     SandParticle(SandParticle),
     IronParticle(IronParticle),
-    AcidParticle(AcidParticle),
     WaterParticle(WaterParticle),
     AgitatedParticle(AgitatedParticle),
     ElectricityParticle(ElectricityParticle),
@@ -27,7 +26,6 @@ pub enum ParticleNum {
     Base,
     Sand,
     Iron,
-    Acid,
     Water,
     Agitated,
     Electricity,
@@ -49,13 +47,6 @@ pub struct SandParticle {
 
 #[derive(Copy, Clone)]
 pub struct IronParticle {
-    pub x: u32,
-    pub y: u32,
-    pub rgba: [u8; 4],
-}
-
-#[derive(Copy, Clone)]
-pub struct AcidParticle {
     pub x: u32,
     pub y: u32,
     pub rgba: [u8; 4],
