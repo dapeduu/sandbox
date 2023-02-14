@@ -1,5 +1,5 @@
 //! Definição das Structs para cada Partícula, declaração das traits básicas de movimento e colisão, definição de Enums para os tipos das partículas.
-//! 
+//!
 //! Toda Partícula possui a mesma estrutura base, contendo posições x,y e uma cor
 //! ```
 //! pub struct Particle {
@@ -84,6 +84,6 @@ pub struct ElectricityParticle {
 pub trait BaseParticle {
     /// Função de movimento da partícula
     fn move_particle(&mut self, frame: &mut [u8]);
-    /// Função de colisão da partícula 
+    /// Função de colisão da partícula
     fn colision(&self, frame: &mut [u8]) -> bool;
 }

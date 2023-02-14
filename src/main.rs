@@ -124,7 +124,7 @@ fn main() -> Result<(), Error> {
                 particlekey = ParticleNum::Water;
             }
             if input.key_pressed(VirtualKeyCode::Key5) {
-                particlekey = ParticleNum::Insect;
+                particlekey = ParticleNum::Agitated;
             }
             if input.key_pressed(VirtualKeyCode::Key6) {
                 particlekey = ParticleNum::Electricity;
@@ -276,7 +276,7 @@ pub fn instanceparticle(
                 };
                 return Some(ParticleType::WaterParticle(novaparticula));
             }
-            ParticleNum::Insect => {
+            ParticleNum::Agitated => {
                 let is_on_agitated = frame[index] == 0x16 // R
                     && frame[index + 1] == 0x16 // G
                     && frame[index + 2] == 0x00 // B
