@@ -1,13 +1,13 @@
 //! Implementação das traits [base](BaseParticle) para cada partícula e definição de [position_to_index]
-//! 
+//!
 //! Todas as partículas se movem 1 píxel por loop lógico, não sendo aplicada aceleração ou outros conceitos físicos, apenas um deslocamento unitário
-//! 
+//!
 //! # Base
-//! 
+//!
 //! teste
-//! 
+//!
 //! # Areia
-//! 
+//!
 //! # Ferro
 use crate::*;
 use rand::Rng;
@@ -17,16 +17,16 @@ pub static WIDTH: u32 = 200;
 pub static HEIGHT: u32 = 150;
 
 /// Mapeia uma posição na tela a um índice de píxel no frame da tela
-/// 
+///
 /// Um frame da tela codifica os pixels como um array, unidimensional encadeando suas componentes rgba.
 /// Dessa forma o píxel 0,0 possui suas componentes r,g,b,a respecitvamente nos índices 0,1,2,3 enquanto que o píxel 1,0, tem suas componentes nos índices 4,5,6,7
 /// de acordo com a largura e altura da janela.
-/// 
+///
 /// Exemplo com largura 400
-/// ```text 
+/// ```text
 /// (0   1    2    3) (4    5   6   7)  ...
 /// (400 401 402 403)  ...
-/// (800 801 802 803)  ... 
+/// (800 801 802 803)  ...
 /// ```
 /// Sendo assim, a função calcula a "linha" a partir de y, e a "coluna" para o píxel a partir de x, retornando o índice da componente r, na qual os próximos 3
 /// serão os outros componentes.
@@ -36,9 +36,9 @@ pub static HEIGHT: u32 = 150;
 pub fn position_to_index(x: u32, y: u32) -> usize {
     return ((y * WIDTH + x) * 4) as usize;
 }
-    //[][][][][] WIDTH*Heigh /30000  0   1    2    3      --- 400
-    //                               400 401 402 403          400
-    //                               800 801 803 803 -
+//[][][][][] WIDTH*Heigh /30000  0   1    2    3      --- 400
+//                               400 401 402 403          400
+//                               800 801 803 803 -
 
 impl BaseParticle for Particle {
     fn move_particle(&mut self, frame: &mut [u8]) {
@@ -108,7 +108,6 @@ impl BaseParticle for IronParticle {
         return false;
     }
 }
-
 
 impl BaseParticle for WaterParticle {
     //Move para baixo se possível
@@ -211,10 +210,10 @@ impl BaseParticle for ElectricityParticle {
                 && frame[index + 2] == 0xff // B
                 && frame[index + 3] == 0xff; // A
 
-            let is_on_metal = frame[index] == 0xff // R
+            let is_on_metal = frame[index] == 0x80 // R
                 && frame[index + 1] == 0x80 // G
                 && frame[index + 2] == 0x80 // B
-                && frame[index + 3] == 0x80; // A
+                && frame[index + 3] == 0xff; // A
 
             return is_on_water || is_on_metal;
         }
@@ -258,5 +257,3 @@ impl BaseParticle for ElectricityParticle {
         return false;
     }
 }
-
-
