@@ -1,3 +1,4 @@
+//! Implementação das traits [base](BaseParticle) para cada partícula e definição de [position_to_index]
 use crate::*;
 use rand::Rng;
 pub static WIDTH: u32 = 200;
@@ -6,6 +7,9 @@ pub static HEIGHT: u32 = 150;
 pub fn position_to_index(x: u32, y: u32) -> usize {
     return ((y * WIDTH + x) * 4) as usize;
 }
+    //[][][][][] WIDTH*Heigh /30000  0   1    2    3      --- 400
+    //                               400 401 402 403          400
+    //                               800 801 803 803 -
 
 impl BaseParticle for Particle {
     fn move_particle(&mut self, frame: &mut [u8]) {

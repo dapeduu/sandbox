@@ -1,3 +1,4 @@
+//! Módulo principal, Lógica de execução, renderização, inicialização e chamada às funções.
 #![deny(clippy::all)]
 
 use log::error;
@@ -282,6 +283,27 @@ pub fn update(vec: &mut [ParticleType], frame: &mut [u8]) {
     }
 }
 
+/// Renderização na tela
+/// Recebe o Frame da tela e o Vetor de partículas contendo todas as partículas instanciadas
+/// 
+/// Inicialmente limpa a tela, preenchendo todos os componentes dos pixels com o valor 150
+/// ```
+/// frame.fill(150);
+/// ```
+/// 
+/// Em seguida, para cada partícula instanciada, dá match de acordo com seu tipo, utiliza [position_to_index] para pegar os valores de posição
+/// da partícula e associar a índices no frame, em seguida preenche as componetes rgba do píxel de acordo com as cores da partícula
+/// 
+/// ```
+/// ParticleType::SandParticle(part) => {
+///     let index: usize = position_to_index(part.x, part.y);
+///     frame[index] = part.rgba[0]; //r
+///     frame[index + 1] = part.rgba[1]; //g
+///     frame[index + 2] = part.rgba[2]; //b
+///     frame[index + 3] = part.rgba[3]; //a
+///     }
+/// ```
+/// 
 pub fn draw(frame: &mut [u8], vec: Vec<ParticleType>) {
     //clear(frame);
     frame.fill(150);
@@ -339,7 +361,5 @@ pub fn draw(frame: &mut [u8], vec: Vec<ParticleType>) {
             }
         }
     }
-    //[][][][][] WIDTH*Heigh /30000  0   1    2    3      --- 400
-    //                               400 401 402 403          400
-    //                               800 801 803 803 -
+
 }

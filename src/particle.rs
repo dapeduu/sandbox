@@ -1,3 +1,6 @@
+//! Definição das Structs para cada Partícula, declaração das traits básicas de movimento e colisão, definição de Enums para os tipos das partículas.
+
+///Enumeration Tipada, constructo específico do rust que se comporta como uma Union de C, utilizada para construir um vetor heterogêneo de partículas
 #[derive(Copy, Clone)]
 pub enum ParticleType {
     Particle(Particle),
@@ -9,6 +12,7 @@ pub enum ParticleType {
     ElectricityParticle(ElectricityParticle),
 }
 
+///Enumeration Tradicional, utilizada para associar tipos às teclas e para realizar o switch
 #[derive(Copy, Clone)]
 pub enum ParticleNum {
     Base,
@@ -70,8 +74,10 @@ pub struct ElectricityParticle {
     pub rgba: [u8; 4],
 }
 
+///Trait base para todas as partículas
 pub trait BaseParticle {
+    /// Função de movimento da partícula
     fn move_particle(&mut self, frame: &mut [u8]);
-
+    /// Função de colisão da partícula 
     fn colision(&self, frame: &mut [u8]) -> bool;
 }
