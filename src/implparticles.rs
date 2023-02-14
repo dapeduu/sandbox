@@ -1,4 +1,6 @@
 //! Implementação das traits [base](BaseParticle) para cada partícula e definição de [position_to_index]
+//! 
+//! Todas as partículas se movem 1 píxel por loop lógico, não sendo aplicada aceleração ou outros conceitos físicos, apenas um deslocamento unitário
 use crate::*;
 use rand::Rng;
 ///Largura Tela

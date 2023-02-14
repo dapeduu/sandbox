@@ -1,4 +1,12 @@
 //! Módulo principal, Lógica de execução, renderização, inicialização e chamada às funções.
+//! 
+//! # Bibliotecas e extras
+//! Para realização do projeto, utilizamos a biblioteca Pixels <https://docs.rs/pixels/latest/pixels/> para abstrair a necessidade de criação de shaders com o wgpu, permitindo
+//! uma renderização mais simplificada. Para o Handling de entrada e criação de janelas, foi utilizada a biblioteca winit, <https://docs.rs/winit/latest/winit/> , que 
+//! permite tratar input e realizar a criação de janelas mais diretamente.
+//! 
+//! Além disso, para o processo de documentação e criação dessa wiki, foi utilizada a feature do cargo docs, o qual permite uma criação de documentação próxima a do Doxygen.
+//! 
 #![deny(clippy::all)]
 
 use log::error;
@@ -75,7 +83,7 @@ fn main() -> Result<(), Error> {
     };
 
     let mut particlevec: Vec<ParticleType> = Vec::new();
-    println!("1: Base ; 2: Areia ; 3: Ferro ; 4: Água ; 5: Agitada ; 6: Eletricidade ");
+    println!("1: Base ; 2: Areia ; 3: Ferro ; 4: Água ; 5: Agitada ; 6: Eletricidade ; P: Troca de modo de clique");
     event_loop.run(move |event, _, control_flow| {
         // println!("Number of particles: {}", particlevec.len());
 

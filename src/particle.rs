@@ -31,6 +31,7 @@ pub enum ParticleNum {
     Electricity,
 }
 
+///Base, apenas cai
 #[derive(Copy, Clone)]
 pub struct Particle {
     pub x: u32,
@@ -38,6 +39,7 @@ pub struct Particle {
     pub rgba: [u8; 4],
 }
 
+///Areia, cai e forma pirâmide de apoio
 #[derive(Copy, Clone)]
 pub struct SandParticle {
     pub x: u32,
@@ -45,6 +47,7 @@ pub struct SandParticle {
     pub rgba: [u8; 4],
 }
 
+///Ferro, não se move
 #[derive(Copy, Clone)]
 pub struct IronParticle {
     pub x: u32,
@@ -52,6 +55,7 @@ pub struct IronParticle {
     pub rgba: [u8; 4],
 }
 
+///Cai e escorrega para os lados tentando cair
 #[derive(Copy, Clone)]
 pub struct WaterParticle {
     pub x: u32,
@@ -59,6 +63,7 @@ pub struct WaterParticle {
     pub rgba: [u8; 4],
 }
 
+///Se move aleatoriamente
 #[derive(Copy, Clone)]
 pub struct AgitatedParticle {
     pub x: u32,
@@ -66,6 +71,7 @@ pub struct AgitatedParticle {
     pub rgba: [u8; 4],
 }
 
+///Parada, quando entra em contato com água se move dentro dela
 #[derive(Copy, Clone)]
 pub struct ElectricityParticle {
     pub x: u32,
