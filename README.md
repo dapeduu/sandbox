@@ -14,3 +14,6 @@ Com isso você deve ter a tela abaixo e já pode testar as diferentes particulas
 ![Tela inicial](docs/initial-screen.png)
 
 
+# Abrindo Wiki/Documentação
+
+`cargo doc --no-deps --open`
