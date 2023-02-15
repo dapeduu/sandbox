@@ -2,13 +2,6 @@
 //!
 //! Todas as partículas se movem 1 píxel por loop lógico, não sendo aplicada aceleração ou outros conceitos físicos, apenas um deslocamento unitário
 //!
-//! # Base
-//!
-//! teste
-//!
-//! # Areia
-//!
-//! # Ferro
 use crate::*;
 use rand::Rng;
 ///Largura Tela
