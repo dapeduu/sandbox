@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":[["position_to_index","Mapeia uma posição na tela a um índice de píxel no frame da tela"]],"static":[["HEIGHT","Altura Tela"],["WIDTH","Largura Tela"]]};
