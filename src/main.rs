@@ -83,7 +83,7 @@ fn main() -> Result<(), Error> {
     };
 
     let mut particlevec: Vec<ParticleType> = Vec::new();
-    println!("1: Base ; 2: Areia ; 3: Ferro ; 4: Água ; 5: Agitada ; 6: Eletricidade ; P: Troca de modo de clique");
+    println!("1: Base ; 2: Areia ; 3: Ferro ; 4: Água ; 5: Agitada ; 6: Eletricidade ; P: Troca de modo de clique ; C: Limpa todas as particulas da tela");
     event_loop.run(move |event, _, control_flow| {
         // println!("Number of particles: {}", particlevec.len());
 
